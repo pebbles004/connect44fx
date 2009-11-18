@@ -185,10 +185,10 @@ public class Grid {
 
     postinit {
         // initialize the grid
-        cells = for ( x in [ 0 .. <columns ], y in [ 0 .. <rows ] ) {
+        cells = for ( column in [ 0 .. <columns ], row in [ 0 .. <rows ] ) {
             Cell {
-                x:x;
-                y:y;
+                row:row;
+                column:column;
             }
         }
 
@@ -212,7 +212,7 @@ public class Grid {
         }
 
         // diagonal top/right to bottom/left
-        for ( x in [ columns + rows .. 0 ] ) {
+        for ( x in [ columns + rows .. 0 step -1 ] ) {
             var cells = for ( delta in [ 0 .. rows ] ) {
                 getCell( x - delta, x - delta );
             }
@@ -233,20 +233,20 @@ public class Grid {
         }
     }
 
-    function getCell( column:Integer, row:Integer ) :Cell {
-        return cells[ cell | cell.x == column and cell.y == row ][0];
+    protected function getCell( column:Integer, row:Integer ) :Cell {
+        return cells[ cell | cell.column == column and cell.row == row ][0];
     }
 
 
    /**
     * Return a sequence of cells (top-down) representing the column
     */
-    function getColumn( column:Integer ) :Cell[] {
-        cells[ x | x.x == column ];
+    protected function getColumn( column:Integer ) :Cell[] {
+        cells[ x | x.column == column ];
     }
 
-    function getRow( row:Integer ) :Cell[] {
-        cells[ y | y.y == row ];
+    protected function getRow( row:Integer ) :Cell[] {
+        cells[ y | y.row == row ];
     }
 
    /**
@@ -260,7 +260,7 @@ public class Grid {
     }
 
     // TODO extend the patterns to wildcards
-    function containsPattern( pattern:String ) :Cell[] {
+    protected function containsPattern( pattern:String ) :Cell[] {
         for ( sequence in cellSequences ) {
             var pos = sequence.toPattern().indexOf( pattern );
             if ( pos != -1 ) {
@@ -273,8 +273,8 @@ public class Grid {
 
 public class Cell {
     public-init var player:Player;
-    public-init var x:Integer;
-    public-init var y:Integer;
+    public-init var column:Integer;
+    public-init var row:Integer;
 
     public-read var winning:Boolean = false;
 }
