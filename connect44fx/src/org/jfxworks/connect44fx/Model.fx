@@ -318,6 +318,16 @@ public abstract class Player {
     */
     public-init var type = "?";
 
+   /**
+    * Callback to handle comments of players.
+    */
+    public-init var onSpeak:function(:String):Void;
+
+   /**
+    * Telling whether the player is thinking about the next move or not
+    */
+    public-read var thinking:Boolean = false;
+
     /**
      * Ask the player to start thinking about the next move. And when the thinking is done
      * the player should call the callback function with the column number (0 .. n) to
@@ -326,5 +336,6 @@ public abstract class Player {
      * @param game Game to select a column from
      * @param onChose callback function to call using the column number as argument
      */
-    public abstract function thinkAboutNextMove( game:Game, onChose:function( :Integer ) :Void );
+    public abstract function thinkAboutNextMove( game:Game, onChose:function( :Integer ) :Void ) :Void;
+
 }
