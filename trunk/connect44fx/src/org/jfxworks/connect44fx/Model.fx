@@ -299,6 +299,9 @@ class CellSequence {
     }
 }
 
+public def PLAYER_TYPE_HUMAN = "H";
+
+public def PLAYER_TYPE_AI    = "A";
 
 /**
  * Class describing a player in the game. This class is abstract 
@@ -309,7 +312,7 @@ public abstract class Player {
     /**
      * Name of the player
      */
-    public-init var name = "";
+    public-init var name;
 
    /**
     * A one-character label indicating what type of player this is.
@@ -317,6 +320,11 @@ public abstract class Player {
     * A : AI
     */
     public-init var type = "?";
+
+    /**
+     * URL to the image of the player.
+     */
+    public-init var imageUrl = "?";
 
    /**
     * Callback to handle comments of players.
