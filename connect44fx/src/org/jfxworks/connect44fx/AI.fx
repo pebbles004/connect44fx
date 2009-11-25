@@ -1,6 +1,9 @@
 /*
  * AI.fx Container for AI ( sort of at least ) stuff of this game.
  *
+ * Modus Operandi : Add a new instance of AIPlayer in the AI_PLAYER sequence.
+ *                  The AI player's level corresponds to its position in the sequence.
+ *
  * Created on 24-nov-2009, 18:35:01
  */
 
@@ -14,7 +17,7 @@ import java.lang.Thread;
 
 def RANDOM:Random = Random{};
 
-def AI_PLAYERS:AIPlayer[] = [];
+var AI_PLAYERS:AIPlayer[] = [];
 
 public function createAIPlayer( level:Integer ) :Player {
     if ( sizeof AI_PLAYERS == 0 ) {
@@ -29,8 +32,25 @@ public function createAIPlayer( level:Integer ) :Player {
 }
 
 function initializeAIPlayers() :Void {
+    // level 0
+    insert CarelessAI {
+        name: "Sinclair ZX81 1KB"
+        type: Model.PLAYER_TYPE_AI
+    } into AI_PLAYERS;
+    // level 1
+    insert CarelessAI {
+        name: "Sinclair ZX Spectrum 48KB"
+        type: Model.PLAYER_TYPE_AI
+        pretendThinkingTimeVariation: 500ms
+    } into AI_PLAYERS;
+    // level 2
+    insert CarelessAI {
+        name: "Sinclair QL 128MB"
+        type: Model.PLAYER_TYPE_AI
+        pretendThinkingTime: 2s
+        pretendThinkingTimeVariation: 500ms
+    } into AI_PLAYERS;
 }
-
 
 /**
  * Base class for all AI players. This class has the very basic functionality of a player
@@ -56,9 +76,15 @@ abstract class AIPlayer extends Player {
             onChose( choices [ RANDOM.nextInt( sizeof choices ) ] );
         }
         else {
-            onSpeak( "Hey ! There nowhere I can play ! Cheater !!!!" );
+            onSpeak( "Hey ! There's nowhere I can play ! Cheater !!!!" );
             onChose( -1 );
         }
     }
 }
 
+/**
+ * This is a kind of player who doesn't care about tactics. Just pretend it's thinking
+ * and drop a coin in a random column where there's still space left.
+ */
+class CarelessAI extends AIPlayer {
+}
