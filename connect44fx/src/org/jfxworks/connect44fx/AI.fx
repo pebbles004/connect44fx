@@ -63,8 +63,12 @@ abstract class AIPlayer extends Player {
     public-init var pretendThinkingTimeVariation = 1s;
 
     override public function thinkAboutNextMove( game:Game, onChose:function( :Integer ) :Void ) :Void  {
+        if ( Model.DEBUG ) {
+            print("Player {name} is on ... ")
+        }
+
         // do we pretend thinking really hard ?
-        if ( pretendThinkingTime.gt( 0s ) ) {
+        if ( pretendThinkingTime.gt( 0s ) and not Model.DEBUG ) {
             def variation = pretendThinkingTimeVariation.toMillis();
             def sleep = pretendThinkingTime.toMillis() + RANDOM.nextInt( variation * 2 ) - variation;
             Thread.currentThread().sleep( sleep );
@@ -76,7 +80,7 @@ abstract class AIPlayer extends Player {
             onChose( choices [ RANDOM.nextInt( sizeof choices ) ] );
         }
         else {
-            onSpeak( "Hey ! There's nowhere I can play ! Cheater !!!!" );
+            onSpeak( this, "Hey ! There's nowhere I can play ! Cheater !!!!" );
             onChose( -1 );
         }
     }
