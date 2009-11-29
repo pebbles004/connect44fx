@@ -5,11 +5,19 @@
  */
 
 package org.jfxworks.connect44fx;
-import org.jfxworks.connect44fx.Model.Game;
+import org.jfxworks.connect44fx.Model.*;
 
 public function run() :Void {
-    def game = Game {
-    
+    def humanPlayer = HumanPlayer {
+        name: "Name from facebook"
+        type: PLAYER_TYPE_HUMAN
     }
+
+
+    def game = Game {
+        humanPlayer: humanPlayer
+    }
+
+    game.start();
 }
 

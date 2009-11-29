@@ -12,13 +12,18 @@ import java.lang.IllegalStateException;
 import java.util.Random;
 import javafx.util.Sequences;
 import org.jfxworks.connect44fx.Model.CellSequence;
+import java.lang.UnsupportedOperationException;
+import org.jfxworks.connect44fx.Model.Game;
 
 def RANDOM = Random{};
+
+public var DEBUG = true;
 
 /**
  * Class describing the conceptual game.
  */
 public class Game {
+
 
     def rows = 6;
 
@@ -78,14 +83,19 @@ public class Game {
 
     public-read var grid:Grid;
 
+    public-init var onSpeak:function (:Player, :String) :Void;
+    public-init var onDraw:function():Void;
+
    /**
     * public function to start the game.
     */
     public function start() {
         // players should be set
-        if ( humanPlayer == null or aiPlayer == null ) {
+        if ( humanPlayer == null ) {
             throw new IllegalStateException("The players are not set yet");
         }
+        humanPlayer.onSpeak = onSpeak;
+
         // do not restart a game
         if ( level == -1 ) {
             // reset the game to the first turn in the next level
@@ -103,9 +113,16 @@ public class Game {
     /**
      * Advance the game into the next level. Reset the turns, select the next player.
      */
-    function nextLevel() {
+    function nextLevel() :Void {
         // reset the game
         level++;
+        if ( DEBUG ) {
+            println("LEVEL {level} BEGINS")
+        }
+
+        aiPlayer = AI.createAIPlayer( level );
+        aiPlayer.onSpeak = onSpeak;
+        
         levelDraw = false;
         levelFinished = false;
         grid = Grid {
@@ -133,12 +150,17 @@ public class Game {
     */
     function nextTurn() :Void {
         turn++;
+        if ( DEBUG ) {
+            println("TURN {turn} BEGINS")
+        }
+
         if ( turn < rows * columns ) {
             nextPlayer.thinkAboutNextMove( this, playerChoses );
         }
         else {
             levelDraw = true;
-            levelFinished = true;
+            onDraw();
+            nextLevel();
         }
     }
 
@@ -146,6 +168,10 @@ public class Game {
      * Function callback for when a player selects a column to insert a coin into
      */
     function playerChoses( column:Integer ) {
+        if ( DEBUG ) {
+            println(" inserting coin into column {column}")
+        }
+
         // tell the game the next coin coming into the selected column
         insertCoinInto ( column );
         // select the other player
@@ -329,7 +355,7 @@ public abstract class Player {
    /**
     * Callback to handle comments of players.
     */
-    public-init var onSpeak:function(:String):Void;
+    public-init var onSpeak:function(:Player, :String):Void;
 
    /**
     * Telling whether the player is thinking about the next move or not
@@ -346,4 +372,12 @@ public abstract class Player {
      */
     public abstract function thinkAboutNextMove( game:Game, onChose:function( :Integer ) :Void ) :Void;
 
+}
+
+/**
+ * A human player does all the thinking outside the application. :-)
+ */
+public class HumanPlayer extends Player {
+    override public function thinkAboutNextMove( game:Game, onChose:function( :Integer ) :Void ) :Void {
+    }
 }
