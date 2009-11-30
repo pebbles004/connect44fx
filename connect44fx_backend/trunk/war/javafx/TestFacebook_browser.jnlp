@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="http://connect44fx.appspot.com/javafx/" href="TestFacebook_browser.jnlp">
+    <information>
+        <title>TestFacebook</title>
+        <vendor>JfxWorks</vendor>
+        <homepage href="http://connect44fx.appspot.com/"/>
+        <description>TestFacebook</description>
+        <offline-allowed/>
+        <shortcut>
+            <desktop/>
+        </shortcut>
+    </information>
+    <security>
+        <all-permissions/>
+    </security>
+    <resources>
+        <j2se version="1.5+"/>
+        <extension name="JavaFX Runtime" href="http://dl.javafx.com/1.2/javafx-rt.jnlp"/>
+        <jar href="TestFacebook.jar" main="true"/>
+        <jar href="lib/facebook-java-api-2.1.1.jar"/>
+        <jar href="lib/facebook-java-api-schema-2.1.1.jar"/>
+        <jar href="lib/activation-1.1.jar"/>
+        <jar href="lib/commons-lang-2.2.jar"/>
+        <jar href="lib/commons-logging-1.1.1.jar"/>
+        <jar href="lib/jaxb-api-2.1.jar"/>
+        <jar href="lib/jaxb-impl-2.1.9.jar"/>
+        <jar href="lib/json-20080701.jar"/>
+        <jar href="lib/runtime-0.4.1.5.jar"/>
+        <jar href="lib/stax-api-1.0-2.jar"/>
+    </resources>
+    <applet-desc name="TestFacebook" main-class="com.sun.javafx.runtime.adapter.Applet" width="720" height="500">
+        <param name="MainJavaFXScript" value="testfacebook.Main" />
+    </applet-desc>
+    <update check="background" />
+</jnlp>
