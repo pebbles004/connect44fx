@@ -6,6 +6,7 @@
 
 package org.jfxworks.connect44fx;
 import org.jfxworks.connect44fx.Model.*;
+import org.jfxworks.connect44fx.View.Board;
 
 public function run() :Void {
     def humanPlayer = HumanPlayer {
@@ -18,6 +19,8 @@ public function run() :Void {
         humanPlayer: humanPlayer
     }
 
-    game.start();
+    View.Board {
+        game: game
+    }
 }
 
