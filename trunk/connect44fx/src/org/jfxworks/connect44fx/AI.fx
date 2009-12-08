@@ -67,6 +67,8 @@ abstract class AIPlayer extends Player {
             print("Player {name} is on ... ")
         }
 
+        // TODO ASYNCHRONOUS !!!!!!!
+
         // do we pretend thinking really hard ?
         if ( pretendThinkingTime.gt( 0s ) and not Model.DEBUG ) {
             def variation = pretendThinkingTimeVariation.toMillis();

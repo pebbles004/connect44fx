@@ -7,15 +7,19 @@ package org.jfxworks.connect44fx;
 
 import javafx.scene.CustomNode;
 import javafx.scene.Node;
-import java.lang.IllegalStateException;
 import javafx.scene.shape.ShapeSubtract;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import org.jfxworks.connect44fx.Model.*;
-import javafx.scene.image.ImageView;
 import javafx.scene.effect.Shadow;
 import javafx.scene.layout.Stack;
 import javafx.scene.layout.Tile;
+import javafx.scene.effect.DropShadow;
+import javafx.fxd.Duplicator;
+import javafx.geometry.HPos;
+
+public def WIDTH  = 400;
+public def HEIGHT = 342;
 
 public function createBoard(game: Game): Board {
     // select on the level of the game a new board
@@ -28,19 +32,48 @@ public class Board extends CustomNode {
 
     public-init var game: Game;
 
-    init {
-        if (game == null or game.grid == null) {
-            throw new IllegalStateException("Board should have a Game and Grid !");
+    def content = Stack {
+            width: WIDTH
+            height: HEIGHT
+        }
+
+    var coinHumanPlayer:Node;
+    var coinAIPlayer:Node;
+
+    def grid = bind game.grid on replace {
+        if ( grid != null ) {
+            content.content = getContent();
         }
     }
 
+
     override protected function create(): Node {
+        content;
+    }
+
+    function getContent() :Node[] {
         // calculate the size of an individual cell
-        def cellWidth = layoutBounds.width / game.grid.columns;
-        def cellHeight = layoutBounds.height / game.grid.rows;
+        def cellWidth = WIDTH / game.grid.columns;
+        def cellHeight = HEIGHT / game.grid.rows;
+
+        // generate the coin nodes
+        // TODO grab this from a resource bundle
+        coinHumanPlayer = Ellipse {
+            radiusX: cellWidth/2 - 6
+            radiusY: cellHeight/2 - 6
+            fill: Color.DARKCYAN
+        }
+
+        coinAIPlayer = Ellipse {
+            radiusX: cellWidth/2 - 6
+            radiusY: cellHeight/2 - 6
+            fill: Color.INDIANRED
+        }
+
 
         // generate the visual cells of the grid
         def cells = for (y in [1..game.grid.columns], x in [1..game.grid.rows]) {
+            
              // COOL !!! An object can INDIVIDUALLY be extended for specific circumstances
              ShapeSubtract {
                 // The model cell this shape is associated with
@@ -49,6 +82,14 @@ public class Board extends CustomNode {
                 // catch the event of a coin being inserted
                 def player = bind cell.player on replace {
                     if ( player != null ) {
+                        println("Player move: {player.name} on {cell.column}x{cell.row}");
+                        def coin = Duplicator.duplicate(coinHumanPlayer) as Ellipse;
+                        coin.layoutX = cellWidth * cell.column;
+                        coin.layoutY = cellHeight * cell.row;
+                        coin.centerX = cellWidth/2;
+                        coin.centerY = cellHeight/2;
+                        insert coin into content.content;
+                        
                        //TODO a player has inserted a coin in this cell  ...
                        // (1) Create a new coin
                        // (2) Animate it falling down from the top to this cell
@@ -72,11 +113,16 @@ public class Board extends CustomNode {
 
                 //TODO : this has to be a shape from a resource bundle
                 b: Ellipse {
-                    radiusX: cellWidth - 10
-                    radiusY: cellWidth - 10
+                    radiusX: cellWidth/2 - 5
+                    radiusY: cellHeight/2 - 5
+                    centerX: cellWidth/2
+                    centerY: cellHeight/2
                 }
 
-                effect: Shadow{}
+                effect: DropShadow {
+                            offsetX: 5
+                            offsetY: 5
+                        }
             }
         }
 
@@ -84,24 +130,18 @@ public class Board extends CustomNode {
         def background = Rectangle {
             x: 0
             y: 0
-            width: layoutBounds.width
-            height: layoutBounds.height
+            width: WIDTH
+            height: HEIGHT
             fill: Color.ANTIQUEWHITE
         }
 
         // Assemble the various components into the board component
-        Stack {
-            width: layoutBounds.width
-            height: layoutBounds.height
-            content: [
-                background,
+        return [background,
                 Tile {
                     content: cells
                     hgap: 0
                     vgap: 0
-                }
-            ]
-        }
+                }]
     }
 }
 
