@@ -7,6 +7,8 @@
 package org.jfxworks.connect44fx;
 import org.jfxworks.connect44fx.Model.*;
 import org.jfxworks.connect44fx.View.Board;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
 
 public function run() :Void {
     def humanPlayer = HumanPlayer {
@@ -18,9 +20,19 @@ public function run() :Void {
     def game = Game {
         humanPlayer: humanPlayer
     }
-
-    View.Board {
-        game: game
+    
+    Stage {
+        title : "Connect44FX - the ONLY game you need !"
+        scene: Scene {
+            width: View.WIDTH
+            height: View.HEIGHT
+            content: View.Board {
+                game: game
+            }
+        }
+        resizable: false
     }
+
+    game.start();
 }
 

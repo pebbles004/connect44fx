@@ -11,9 +11,9 @@ package org.jfxworks.connect44fx;
 import java.lang.IllegalStateException;
 import java.util.Random;
 import javafx.util.Sequences;
-import org.jfxworks.connect44fx.Model.CellSequence;
-import java.lang.UnsupportedOperationException;
-import org.jfxworks.connect44fx.Model.Game;
+import org.jfxworks.connect44fx.Model.*;
+import org.jfxtras.async.*;
+import java.lang.Exception;
 
 def RANDOM = Random{};
 
@@ -155,6 +155,7 @@ public class Game {
         }
 
         if ( turn < rows * columns ) {
+            println("Thinking...");
             nextPlayer.thinkAboutNextMove( this, playerChoses );
         }
         else {
@@ -184,6 +185,12 @@ public class Game {
         if ( winningSequenceFound() ) {
             winningPlayer = nextPlayer;
             levelFinished = true;
+        }
+        else {
+            def freeCells = grid.getColumn( column )[ x | x.player == null ];
+            if ( sizeof freeCells > 0 ) {
+                freeCells[ sizeof freeCells - 1 ].player = nextPlayer;
+            }
         }
     }
 
