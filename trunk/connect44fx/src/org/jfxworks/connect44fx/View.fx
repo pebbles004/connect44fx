@@ -12,11 +12,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import org.jfxworks.connect44fx.Model.*;
 import javafx.scene.effect.Shadow;
-import javafx.scene.layout.Stack;
-import javafx.scene.layout.Tile;
+import javafx.scene.layout.*;
 import javafx.scene.effect.DropShadow;
 import javafx.fxd.Duplicator;
 import javafx.geometry.HPos;
+import javafx.scene.input.MouseEvent;
 
 public def WIDTH  = 400;
 public def HEIGHT = 342;
@@ -32,7 +32,7 @@ public class Board extends CustomNode {
 
     public-init var game: Game;
 
-    def content = Stack {
+    def content = Panel {
             width: WIDTH
             height: HEIGHT
         }
@@ -41,8 +41,9 @@ public class Board extends CustomNode {
     var coinAIPlayer:Node;
 
     def grid = bind game.grid on replace {
+        println("Grid changes !");
         if ( grid != null ) {
-            content.content = getContent();
+            content.content = getContent( grid );
         }
     }
 
@@ -51,39 +52,47 @@ public class Board extends CustomNode {
         content;
     }
 
-    function getContent() :Node[] {
+    function getContent( grid:Grid ) :Node[] {
         // calculate the size of an individual cell
-        def cellWidth = WIDTH / game.grid.columns;
-        def cellHeight = HEIGHT / game.grid.rows;
+        def cellWidth = WIDTH / grid.columns;
+        def cellHeight = HEIGHT / grid.rows;
 
         // generate the coin nodes
         // TODO grab this from a resource bundle
         coinHumanPlayer = Ellipse {
-            radiusX: cellWidth/2 - 6
-            radiusY: cellHeight/2 - 6
+            radiusX: cellWidth/2 - 8
+            radiusY: cellHeight/2 - 8
             fill: Color.DARKCYAN
         }
 
         coinAIPlayer = Ellipse {
-            radiusX: cellWidth/2 - 6
-            radiusY: cellHeight/2 - 6
+            radiusX: cellWidth/2 - 8
+            radiusY: cellHeight/2 - 8
             fill: Color.INDIANRED
         }
 
 
         // generate the visual cells of the grid
-        def cells = for (y in [1..game.grid.columns], x in [1..game.grid.rows]) {
+        def cells = for (x in [1..grid.columns], y in [1..grid.rows]) {
             
              // COOL !!! An object can INDIVIDUALLY be extended for specific circumstances
              ShapeSubtract {
+
                 // The model cell this shape is associated with
-                def cell = game.grid.getCell( x, y );
+                // TODO find out why this expression has to be bound ??
+                def cell = bind grid.getCell( x, y );
 
                 // catch the event of a coin being inserted
                 def player = bind cell.player on replace {
                     if ( player != null ) {
                         println("Player move: {player.name} on {cell.column}x{cell.row}");
-                        def coin = Duplicator.duplicate(coinHumanPlayer) as Ellipse;
+
+
+                        var coin:Ellipse = Duplicator.duplicate(coinHumanPlayer) as Ellipse;
+                        if ( player.isAI() ) {
+                            coin = Duplicator.duplicate(coinAIPlayer) as Ellipse;
+                        }
+
                         coin.layoutX = cellWidth * cell.column;
                         coin.layoutY = cellHeight * cell.row;
                         coin.centerX = cellWidth/2;
@@ -123,6 +132,12 @@ public class Board extends CustomNode {
                             offsetX: 5
                             offsetY: 5
                         }
+
+                onMouseClicked: function ( event:MouseEvent ) :Void {
+                                    if ( game.nextPlayer.isHuman() ) {
+                                        (game.nextPlayer as Model.HumanPlayer).play( cell.column );
+                                    }
+                                }
             }
         }
 
@@ -138,10 +153,13 @@ public class Board extends CustomNode {
         // Assemble the various components into the board component
         return [background,
                 Tile {
+                    columns: grid.columns
+                    rows: grid.rows
                     content: cells
                     hgap: 0
                     vgap: 0
                 }]
     }
+
 }
 

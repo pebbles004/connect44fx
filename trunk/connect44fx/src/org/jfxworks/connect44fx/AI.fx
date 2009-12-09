@@ -35,18 +35,15 @@ function initializeAIPlayers() :Void {
     // level 0
     insert CarelessAI {
         name: "Sinclair ZX81 1KB"
-        type: Model.PLAYER_TYPE_AI
     } into AI_PLAYERS;
     // level 1
     insert CarelessAI {
         name: "Sinclair ZX Spectrum 48KB"
-        type: Model.PLAYER_TYPE_AI
         pretendThinkingTimeVariation: 500ms
     } into AI_PLAYERS;
     // level 2
     insert CarelessAI {
         name: "Sinclair QL 128MB"
-        type: Model.PLAYER_TYPE_AI
         pretendThinkingTime: 2s
         pretendThinkingTimeVariation: 500ms
     } into AI_PLAYERS;
@@ -63,10 +60,6 @@ abstract class AIPlayer extends Player {
     public-init var pretendThinkingTimeVariation = 1s;
 
     override public function thinkAboutNextMove( game:Game, onChose:function( :Integer ) :Void ) :Void  {
-        if ( Model.DEBUG ) {
-            print("Player {name} is on ... ")
-        }
-
         // TODO ASYNCHRONOUS !!!!!!!
 
         // do we pretend thinking really hard ?
