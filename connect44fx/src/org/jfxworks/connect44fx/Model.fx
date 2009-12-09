@@ -12,7 +12,6 @@ import java.lang.IllegalStateException;
 import java.util.Random;
 import javafx.util.Sequences;
 import org.jfxworks.connect44fx.Model.*;
-import org.jfxtras.async.*;
 import java.lang.Exception;
 
 def RANDOM = Random{};
@@ -125,10 +124,13 @@ public class Game {
         
         levelDraw = false;
         levelFinished = false;
-        grid = Grid {
+
+        var tempGrid = Grid {
             rows: rows;
             columns: columns;
         }
+
+        grid = tempGrid;
 
         // select the player to make the first move
         winningPlayer = null;
@@ -151,11 +153,11 @@ public class Game {
     function nextTurn() :Void {
         turn++;
         if ( DEBUG ) {
-            println("TURN {turn} BEGINS")
+            println("TURN {turn} BEGINS. Player '{nextPlayer.name}' is on.")
         }
 
         if ( turn < rows * columns ) {
-            println("Thinking...");
+            println("  Player is thinking about next move ...");
             nextPlayer.thinkAboutNextMove( this, playerChoses );
         }
         else {
@@ -176,7 +178,7 @@ public class Game {
         // tell the game the next coin coming into the selected column
         insertCoinInto ( column );
         // select the other player
-        nextPlayer = if ( nextPlayer == humanPlayer ) aiPlayer else humanPlayer;
+        nextPlayer = if ( nextPlayer.isHuman() ) aiPlayer else humanPlayer;
         // asks the player to make his next move
         nextTurn();
     }
@@ -216,7 +218,9 @@ public class Grid {
 
     var cellSequences:CellSequence[];
 
-    postinit {
+    init {
+        println("init grid");
+        
         // initialize the grid
         cells = for ( column in [ 0 .. <columns ], row in [ 0 .. <rows ] ) {
             Cell {
@@ -266,8 +270,9 @@ public class Grid {
         }
     }
 
-    protected function getCell( column:Integer, row:Integer ) :Cell {
-        return cells[ cell | cell.column == column and cell.row == row ][0];
+    protected bound function getCell( column:Integer, row:Integer ) :Cell {
+        var temp:Cell = cells[ cell | cell.column == column and cell.row == row ][0];
+        return temp;
     }
 
 
@@ -352,7 +357,7 @@ public abstract class Player {
     * H : Human
     * A : AI
     */
-    public-init var type = "?";
+    public-read var type = PLAYER_TYPE_AI;
 
     /**
      * URL to the image of the player.
@@ -379,12 +384,30 @@ public abstract class Player {
      */
     public abstract function thinkAboutNextMove( game:Game, onChose:function( :Integer ) :Void ) :Void;
 
+    public function isHuman() {
+        return type == PLAYER_TYPE_HUMAN;
+    }
+
+    public function isAI() {
+        return type == PLAYER_TYPE_AI;
+    }
 }
 
 /**
  * A human player does all the thinking outside the application. :-)
  */
 public class HumanPlayer extends Player {
+    var playCallback:function(:Integer):Void;
+
+    postinit {
+        type = PLAYER_TYPE_HUMAN;
+    }
+
     override public function thinkAboutNextMove( game:Game, onChose:function( :Integer ) :Void ) :Void {
+        playCallback = onChose;
+    }
+
+    package function play( column:Integer ) {
+        playCallback ( column );
     }
 }

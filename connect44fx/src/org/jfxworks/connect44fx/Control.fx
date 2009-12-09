@@ -13,7 +13,6 @@ import javafx.scene.Scene;
 public function run() :Void {
     def humanPlayer = HumanPlayer {
         name: "Name from facebook"
-        type: PLAYER_TYPE_HUMAN
     }
 
 
