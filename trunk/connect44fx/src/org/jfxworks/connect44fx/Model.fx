@@ -114,12 +114,11 @@ public class Game {
      */
     function nextLevel() :Void {
         // reset the game
-        level++;
         if ( DEBUG ) {
-            println("LEVEL {level} BEGINS")
+            println("LEVEL {level+1} BEGINS")
         }
 
-        aiPlayer = AI.createAIPlayer( level );
+        aiPlayer = AI.createAIPlayer( level+1 );
         aiPlayer.onSpeak = onSpeak;
         
         levelDraw = false;
@@ -143,6 +142,7 @@ public class Game {
 
         // start the first of turns
         turn = -1;
+        level++;
         nextTurn();
     }
 
@@ -171,16 +171,14 @@ public class Game {
      * Function callback for when a player selects a column to insert a coin into
      */
     function playerChoses( column:Integer ) {
-        if ( DEBUG ) {
-            println(" inserting coin into column {column}")
-        }
-
         // tell the game the next coin coming into the selected column
-        insertCoinInto ( column );
-        // select the other player
-        nextPlayer = if ( nextPlayer.isHuman() ) aiPlayer else humanPlayer;
-        // asks the player to make his next move
-        nextTurn();
+        if ( grid.addCoinIntoColumn(column, nextPlayer) ) {
+            // select the other player
+            nextPlayer = if ( nextPlayer.isHuman() ) aiPlayer else humanPlayer;
+
+            // asks the player to make his next move
+            nextTurn();
+        }
     }
 
     function insertCoinInto( column:Integer ) {
@@ -189,7 +187,7 @@ public class Game {
             levelFinished = true;
         }
         else {
-            def freeCells = grid.getColumn( column )[ x | x.player == null ];
+            def freeCells = grid.getColumn(column);
             if ( sizeof freeCells > 0 ) {
                 freeCells[ sizeof freeCells - 1 ].player = nextPlayer;
             }
@@ -218,9 +216,7 @@ public class Grid {
 
     var cellSequences:CellSequence[];
 
-    init {
-        println("init grid");
-        
+    postinit {
         // initialize the grid
         cells = for ( column in [ 0 .. <columns ], row in [ 0 .. <rows ] ) {
             Cell {
@@ -263,11 +259,13 @@ public class Grid {
    /**
     * Assign a player to the last free cell in the given column
     */
-    public function addCoinIntoColumn( column:Integer, player:Player ) {
+    public function addCoinIntoColumn( column:Integer, player:Player ) :Boolean {
         if ( Sequences.indexOf(availableColumns(), column) != -1 ) {
             var freeCellsInColumn = getColumn( column )[ x | x.player == null ];
             freeCellsInColumn[ sizeof freeCellsInColumn - 1 ].player = player;
+            return true;
         }
+        return false;
     }
 
     protected bound function getCell( column:Integer, row:Integer ) :Cell {
