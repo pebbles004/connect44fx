@@ -62,12 +62,12 @@ abstract class AIPlayer extends Player {
     override public function thinkAboutNextMove( game:Game, onChose:function( :Integer ) :Void ) :Void  {
         // TODO ASYNCHRONOUS !!!!!!!
 
-        // do we pretend thinking really hard ?
-        if ( pretendThinkingTime.gt( 0s ) and not Model.DEBUG ) {
-            def variation = pretendThinkingTimeVariation.toMillis();
-            def sleep = pretendThinkingTime.toMillis() + RANDOM.nextInt( variation * 2 ) - variation;
-            Thread.currentThread().sleep( sleep );
-        }
+// TODO Enable in real game
+//        if ( pretendThinkingTime.gt( 0s ) ) {
+//            def variation = pretendThinkingTimeVariation.toMillis();
+//            def sleep = pretendThinkingTime.toMillis() + RANDOM.nextInt( variation * 2 ) - variation;
+//            Thread.currentThread().sleep( sleep );
+//        }
 
         // select a random column
         def choices = game.grid.availableColumns();

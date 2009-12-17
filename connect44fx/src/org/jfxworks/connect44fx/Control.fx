@@ -10,20 +10,32 @@ import org.jfxworks.connect44fx.View.*;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javax.swing.text.View;
+import javafx.scene.input.MouseEvent;
 
 public def WIDTH  = 400;
 public def HEIGHT = 342;
 
 public function run() :Void {
-    def humanPlayer = HumanPlayer {
-        name: "Name from facebook"
-    }
-
 
     def game = Game {
-        humanPlayer: humanPlayer
-    }
-    
+        humanPlayer: HumanPlayer {
+            name: "The CPU Grinder"
+        }
+    };
+
+    def winningPlayer = bind game.winningPlayer on replace {
+        if ( winningPlayer != null ) {
+            playerWins(winningPlayer);
+        }
+    };
+
+    var currentPlayer = bind game.currentPlayer on replace {
+        if ( currentPlayer != null ) {
+            println("It's {currentPlayer.name} turn ... ");
+        }
+    };
+
+
     Stage {
         title : "Connect44FX - the ONLY game you need !"
         scene: Scene {
@@ -33,7 +45,10 @@ public function run() :Void {
         }
         resizable: false
     }
-
-    game.start();
 }
+
+function playerWins( player:Player ) :Void {
+    println("YES ! Player {player.name} wins this round !");
+}
+
 
