@@ -16,19 +16,25 @@ import java.lang.Exception;
 
 def RANDOM = Random{};
 
-public var DEBUG = true;
+public def PLAYER_TYPE_HUMAN = "H";
+
+public def PLAYER_TYPE_AI    = "A";
 
 /**
  * Class describing the conceptual game.
+ *
+ * The aim is to allow visual components to bind with the various state variables of this object.
  */
 public class Game {
 
+    //TODO get this data from from a resource bundle
+    public-read var rows = 6;
 
-    def rows = 6;
+    //TODO get this data from from a resource bundle
+    public-read var columns = 7;
 
-    def columns = 7;
-
-    def coinsNeededToWin = 4;
+    //TODO get this data from from a resource bundle
+    public-read var coinsNeededToWin = 4;
 
     /**
      * Who's the human player - settable at initialization time
@@ -43,107 +49,101 @@ public class Game {
    /**
     * Who's next ?
     */
-    public-read var nextPlayer:Player;
+    public-read var currentPlayer:Player;
 
     /**
      * Who's winning ?
      */
     public-read var winningPlayer:Player;
 
-    /**
-     * Current level of the game - 0 is the first level. To each level corresponds one
-     * specific AI player.
-     */
-    public-read var level = -1;
-
-    /**
-     * Indicates whether the current level has finished (ie there is a winning combination of coins 
-     * in the game.
-     */
-    public-read var levelFinished = true;
-
    /**
-    * indicates whether the current level has ended in a draw - nobody won. 
+    * indicates whether the current round has ended in a draw - nobody won.
     */
-    public-read var levelDraw = false;
-
-    /**
-     * Current turn in the current level of the game - 0 for the first turn. Can not be larger
-     * than columns x rows product.
-     *
-     * Reset to 0 at each new level.
-     */
-    public-read var turn = -1;
+    public-read var draw = false;
 
    /**
-    * Indicates whether the game has ended
+    * Indicates whether the game has ended - the human player was beaten
     */
     public-read var gameFinished:Boolean = false;
 
+    /**
+     * Current round of the game - 1 is the first round.
+     */
+    public-read var round = 0;
+
+    /**
+     * Current turn in the current round of the game - 1 for the first turn. Can not be larger
+     * than columns & rows product.
+     *
+     * Reset to 0 at each new round.
+     */
+    public-read var turn = 0;
+
+    /**
+     * The conceptual grid that's behind the game. Reintialized at each new round
+     */
     public-read var grid:Grid;
 
+    /**
+     * Callback function in case a player says something
+     */
     public-init var onSpeak:function (:Player, :String) :Void;
-    public-init var onDraw:function():Void;
 
-   /**
-    * public function to start the game.
-    */
-    public function start() {
-        // players should be set
-        if ( humanPlayer == null ) {
-            throw new IllegalStateException("The players are not set yet");
-        }
+    /**
+     * Callback function in case the game communicates something
+     */
+    public-init var onMessage:function ( :String ):Void;
+
+    /**
+     * Flag to indicate the next turn needs to reinitialize the next round
+     */
+    var needsInitialisation = true;
+
+    postinit {
+        // redirect human speach
         humanPlayer.onSpeak = onSpeak;
-
-        // do not restart a game
-        if ( level == -1 ) {
-            // reset the game to the first turn in the next level
-            nextLevel();
-        }
     }
 
-   /**
-    * Stopping the game - it's over. Restarting won't work.
-    */
-    public function stop() {
-        gameFinished = true;
+    public function startRound() :Void {
+        if ( turn == 0 ) {
+            nextTurn();
+        }
     }
 
     /**
-     * Advance the game into the next level. Reset the turns, select the next player.
+     * Prepare the game to start the given round. But don't start it just yet. It's always
+     * the human player who kicks off a round. Even if the AI player is starting
      */
-    function nextLevel() :Void {
-        // reset the game
-        if ( DEBUG ) {
-            println("LEVEL {level+1} BEGINS")
-        }
-
-        aiPlayer = AI.createAIPlayer( level+1 );
+    function resetToRound( round:Integer ) :Void {
+        println("Reset game to round {round}");
+    // TODO get this from a resource bundle of some kind
+        rows = 6;
+        columns = 7;
+        coinsNeededToWin = 4;
+    // select new AI player
+        aiPlayer = AI.createAIPlayer( round );
         aiPlayer.onSpeak = onSpeak;
-        
-        levelDraw = false;
-        levelFinished = false;
-
-        var tempGrid = Grid {
+    // create new grid
+        def tempGrid = Grid {
             rows: rows;
             columns: columns;
+            minimumCellSequenceLength: coinsNeededToWin
         }
-
         grid = tempGrid;
-
-        // select the player to make the first move
+        
+    // reset various vars
         winningPlayer = null;
+        draw = false;
         if ( RANDOM.nextBoolean() ) {
-            nextPlayer = humanPlayer;
+            currentPlayer = humanPlayer;
         }
         else {
-            nextPlayer = aiPlayer;
+            currentPlayer = aiPlayer;
         }
-
-        // start the first of turns
-        turn = -1;
-        level++;
-        nextTurn();
+        println("Current player: {currentPlayer.name}");
+    // says the round is initialized
+        turn = 0;
+        needsInitialisation = false;
     }
 
    /**
@@ -151,19 +151,20 @@ public class Game {
     * next move.
     */
     function nextTurn() :Void {
-        turn++;
-        if ( DEBUG ) {
-            println("TURN {turn} BEGINS. Player '{nextPlayer.name}' is on.")
+        // reset to the next round
+        if ( needsInitialisation ) {
+            resetToRound( round + 1 );
+            round++;
         }
 
+        // start a new turn
+        turn++;
         if ( turn < rows * columns ) {
-            println("  Player is thinking about next move ...");
-            nextPlayer.thinkAboutNextMove( this, playerChoses );
+            currentPlayer.thinkAboutNextMove( this, playerChoses );
         }
         else {
-            levelDraw = true;
-            onDraw();
-            nextLevel();
+            draw = true;
+            needsInitialisation = true;
         }
     }
 
@@ -172,31 +173,36 @@ public class Game {
      */
     function playerChoses( column:Integer ) {
         // tell the game the next coin coming into the selected column
-        if ( grid.addCoinIntoColumn(column, nextPlayer) ) {
-            // select the other player
-            nextPlayer = if ( nextPlayer.isHuman() ) aiPlayer else humanPlayer;
-
-            // asks the player to make his next move
-            nextTurn();
-        }
-    }
-
-    function insertCoinInto( column:Integer ) {
-        if ( winningSequenceFound() ) {
-            winningPlayer = nextPlayer;
-            levelFinished = true;
-        }
-        else {
-            def freeCells = grid.getColumn(column);
-            if ( sizeof freeCells > 0 ) {
-                freeCells[ sizeof freeCells - 1 ].player = nextPlayer;
+        if ( grid.addCoinIntoColumn(column, currentPlayer) ) {
+            if ( winningSequenceFound() ) {
+                winningPlayer = currentPlayer;
+                needsInitialisation = true;
+            }
+            else {
+                // select the other player
+                currentPlayer = if ( currentPlayer instanceof HumanPlayer ) aiPlayer else humanPlayer;
+                println("Player is now {currentPlayer} {currentPlayer.name}");
+                // asks the player to make his next move
+                nextTurn();
             }
         }
     }
 
     function winningSequenceFound() :Boolean {
-        // TODO scan for x consecutive coins
-        return false;
+        var winningSequence = "";
+        for ( x in [ 1 .. coinsNeededToWin ] ) {
+            winningSequence = "{winningSequence}{currentPlayer.type}";
+        }
+        var pattern = grid.findPattern(winningSequence);
+
+        if ( pattern != null ) {
+            for ( cell in pattern ) {
+                cell.winning = true;
+            }
+            winningPlayer = pattern[0].player;
+        }
+
+        return pattern != null;
     }
 
 }
@@ -226,45 +232,46 @@ public class Grid {
         }
 
         // initialize sequences of cells in which consecutive coins can occur.
-        for ( y in [ 0 .. <rows ] ) {
-            insert CellSequence{ cells: getRow( y ) } into cellSequences;
+        for ( row in [ 0 .. <rows ] ) {
+            insert CellSequence{ cells: getRow( row ) } into cellSequences;
         }
-        for ( x in [ 0 .. <columns ] ) {
-            insert CellSequence{ cells: getColumn( x ) } into cellSequences;
-        }
-
-        // diagonal top/left to bottom/right
-        for ( x in [ -rows .. columns ] ) {
-            var cells = for ( delta in [ 0 .. rows ] ) {
-                getCell( x + delta, x + delta );
-            }
-            delete null from cells;
-            if ( sizeof cells >= minimumCellSequenceLength ) {
-                insert CellSequence{ cells: cells } into cellSequences;
-            }
+        for ( column in [ 0 .. <columns ] ) {
+            insert CellSequence{ cells: getColumn( column ) } into cellSequences;
         }
 
-        // diagonal top/right to bottom/left
-        for ( x in [ columns + rows .. 0 step -1 ] ) {
-            var cells = for ( delta in [ 0 .. rows ] ) {
-                getCell( x - delta, x - delta );
-            }
-            delete null from cells;
-            if ( sizeof cells >= minimumCellSequenceLength ) {
-                insert CellSequence{ cells: cells } into cellSequences;
-            }
+        // diagonals
+        for ( column in [ (-rows-1) .. <columns ] ) {
+            // top/left to bottom/right
+            var diag1 =  for ( row in [ 0 .. <rows ] ) {
+                getCell( column + row, row );
+            };
+            insert CellSequence{ cells:diag1 } into cellSequences;
+            // bottom/left to top/right
+            var diag2 = for ( row in [ (rows-1) .. 0 step -1 ] ) {
+                getCell( column + row, row );
+            };
+            insert CellSequence{ cells:diag2 } into cellSequences;
         }
+
+        // eliminate invalid sequences - a sequence must be at least the minimum number of coins long
+        for ( sequence in cellSequences ) {
+            // eliminate cells with null values (as a consequence of the diagonals)
+            delete null from sequence.cells;
+        }
+        cellSequences = cellSequences[ seq | sizeof seq.cells >= minimumCellSequenceLength ];
     }
 
    /**
     * Assign a player to the last free cell in the given column
     */
     public function addCoinIntoColumn( column:Integer, player:Player ) :Boolean {
+        // valid move
         if ( Sequences.indexOf(availableColumns(), column) != -1 ) {
             var freeCellsInColumn = getColumn( column )[ x | x.player == null ];
             freeCellsInColumn[ sizeof freeCellsInColumn - 1 ].player = player;
             return true;
         }
+        // invalid move
         return false;
     }
 
@@ -296,9 +303,9 @@ public class Grid {
     }
 
     // TODO extend the patterns to wildcards
-    protected function containsPattern( pattern:String ) :Cell[] {
+    protected function findPattern( pattern:String ) :Cell[] {
         for ( sequence in cellSequences ) {
-            var pos = sequence.toPattern().indexOf( pattern );
+            var pos = sequence.pattern.indexOf( pattern );
             if ( pos != -1 ) {
                 return sequence.cells[ pos .. pos + pattern.length() - 1 ];
             }
@@ -316,28 +323,25 @@ public class Cell {
 }
 
 class CellSequence {
-    public-init var cells:Cell[];
+    public-read var cells:Cell[] on replace {
+                                    buildPatternString();
+                                 };
 
-    //TODO should be done with binding in some way...
-    function toPattern() :String {
-        var pattern = "";
-        for ( cell in cells ) {
-            if ( cell.player != null ) {
-                pattern = "{pattern}{cell.player.type}";
-            }
-            else {
-                pattern = "{pattern} ";
-            }
+    var patternSeq = bind for ( cell in cells ) {
+                             if ( cell.player != null ) cell.player.type else " ";
+                          } on replace {
+                             buildPatternString();
+                          };
 
+    public-read var pattern:String;
+
+    function buildPatternString() :Void {
+        pattern = "";
+        for ( type in patternSeq ) {
+            pattern = "{pattern}{type}";
         }
-
-        return pattern;
     }
 }
-
-public def PLAYER_TYPE_HUMAN = "H";
-
-public def PLAYER_TYPE_AI    = "A";
 
 /**
  * Class describing a player in the game. This class is abstract 

@@ -3,7 +3,7 @@
  *
  * Script containing all visual components of the game. Initially we'll create them with
  * hardcoding in factory methods. But in the end some kind of graphics software should be used to
- * create level-dependend graphics in those same methods.
+ * create round-dependend graphics in those same methods.
  *
  * Created on 25-nov-2009, 14:43:38
  */
@@ -30,6 +30,7 @@ import java.lang.Void;
 import org.jfxworks.connect44fx.Model;
 import org.jfxworks.connect44fx.Model.Game;
 import org.jfxworks.connect44fx.Model.Player;
+import javafx.animation.*;
 
 
 
@@ -46,7 +47,7 @@ var boardWidth:Integer;
 var boardHeight:Integer;
 
 // TODO use a resource bundle for this
-function createCellNode( width:Integer, height:Integer, level:Integer ): Node {
+function createCellNode( width:Integer, height:Integer, round:Integer ): Node {
     Group {
       content: [
         // a background rectangle is needed to make sure the mouse click event is caught.
@@ -88,7 +89,7 @@ function createCellNode( width:Integer, height:Integer, level:Integer ): Node {
 }
 
 // TODO use a resource bundle for this
-function createCoinNode( width:Integer, height:Integer, level:Integer, player:Player ): Node {
+function createCoinNode( width:Integer, height:Integer, round:Integer, player:Player ): Node {
     var coin:Node;
 
     if ( player.isHuman() ) {
@@ -124,20 +125,27 @@ public class Board extends CustomNode {
     public-init var game: Game;
 
     def container:Panel = Panel {
-        }
+                                    content: Rectangle {
+                                        width: boardWidth
+                                        height: boardHeight
+                                        fill: Color.BLANCHEDALMOND
+                                        onMouseClicked: function( event:MouseEvent ) :Void {
+                                            game.startRound();
+                                        }
+                                    }
+                                };
 
     override protected function create(): Node {
         container;
     }
 
-    var currentLevel = bind game.level on replace {
-        // level -1 is the default value
-        if ( isInitialized( currentLevel ) and currentLevel >= 0 ) {
-            rebuildContent( currentLevel );
+    var currentRound = bind game.round on replace {
+        if ( currentRound > 0 ) {
+            rebuildContent( currentRound );
         }
     }
 
-    var currentPlayer = bind game.nextPlayer;
+    var currentPlayer = bind game.currentPlayer;
 
     var cellWidth:Integer = 0;
     var cellHeight:Integer = 0;
@@ -146,15 +154,17 @@ public class Board extends CustomNode {
     var coinAIPlayer:Node;
     var cellNode:Node;
 
-    function rebuildContent( level:Integer ) :Void {
+    function rebuildContent( round:Integer ) :Void {
+        print("Building grid ... ");
+
         // cell sizing
         cellWidth  = ( boardWidth  / game.grid.columns ) as Integer;
         cellHeight = ( boardHeight / game.grid.rows ) as Integer;
 
         // coin nodes
-        coinHumanPlayer = createCoinNode(cellWidth, cellHeight, level, game.humanPlayer);
-        coinAIPlayer    = createCoinNode(cellWidth, cellHeight, level, game.aiPlayer);
-        cellNode        = createCellNode(cellWidth, cellHeight, level);
+        coinHumanPlayer = createCoinNode(cellWidth, cellHeight, round, game.humanPlayer);
+        coinAIPlayer    = createCoinNode(cellWidth, cellHeight, round, game.aiPlayer);
+        cellNode        = createCellNode(cellWidth, cellHeight, round);
 
         // creating content
         container.content = Tile {
@@ -185,6 +195,28 @@ public class Board extends CustomNode {
                         }
                     }
 
+                    var win = bind cell.winning on replace {
+                        if ( win ) {
+                            def coin = stack.content[sizeof stack.content - 1];
+                            Timeline {
+                                repeatCount: 5
+                                autoReverse: true
+                                keyFrames: [
+                                               at (0s) {
+                                                   coin.scaleX => 1.0 tween Interpolator.EASEBOTH
+                                               }
+                                               at (500ms) {
+                                                   coin.scaleX => 0.0 tween Interpolator.EASEBOTH
+                                               }
+                                               at (1s) {
+                                                   coin.scaleX => -1.0 tween Interpolator.EASEBOTH
+                                               }
+                                           ]
+                            }.play();
+                        }
+                    }
+
+
                     onMouseClicked: function( event:MouseEvent ) :Void {
                         if ( currentPlayer.isHuman() ) {
                             (currentPlayer as Model.HumanPlayer).play( cell.column );
@@ -193,6 +225,9 @@ public class Board extends CustomNode {
                 }
             }
         }
+
+        println("built !");
+        this.doLayout();
     }
 }
 
