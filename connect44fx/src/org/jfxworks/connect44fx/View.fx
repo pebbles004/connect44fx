@@ -12,108 +12,16 @@ package org.jfxworks.connect44fx;
 import javafx.scene.CustomNode;
 import javafx.scene.Node;
 import org.jfxworks.connect44fx.Model.*;
-import javafx.scene.Group;
 import javafx.fxd.Duplicator;
-import javafx.scene.Node;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.LayoutInfo;
 import javafx.scene.layout.Panel;
 import javafx.scene.layout.Stack;
 import javafx.scene.layout.Tile;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Ellipse;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.ShapeSubtract;
 import java.lang.Integer;
 import java.lang.Void;
 import org.jfxworks.connect44fx.Model;
-import org.jfxworks.connect44fx.Model.Game;
-import org.jfxworks.connect44fx.Model.Player;
 import javafx.animation.*;
-
-
-
-// TODO use a resource bundle for this
-public function createBoardNode( width:Integer, height:Integer, game: Game): Node {
-    boardWidth = width;
-    boardHeight = height;
-    Board {
-        game: game;
-    }
-}
-
-var boardWidth:Integer;
-var boardHeight:Integer;
-
-// TODO use a resource bundle for this
-function createCellNode( width:Integer, height:Integer, round:Integer ): Node {
-    Group {
-      content: [
-        // a background rectangle is needed to make sure the mouse click event is caught.
-        // the basic shape is a hollow rectangle. Clicking in the hole doesn't trigger
-        // the mouse click handler !!!
-        Rectangle {
-            width: width
-            height: height
-            fill: Color.IVORY
-        }
-
-        ShapeSubtract {
-            a: Rectangle {
-                width: width
-                height: height
-                fill: Color.ALICEBLUE
-            }
-
-            b: Ellipse {
-                radiusX: width/2 - 5
-                radiusY: height/2 - 5
-                centerX: width/2
-                centerY: height/2
-            }
-
-            // Otherwise the special effect will shift the whole grid by 5x5 pixels !
-            clip: Rectangle {
-                width: width
-                height: height
-            }
-
-            effect: DropShadow {
-                        offsetX: 5
-                        offsetY: 5
-                    }
-        }
-        ]
-    }
-}
-
-// TODO use a resource bundle for this
-function createCoinNode( width:Integer, height:Integer, round:Integer, player:Player ): Node {
-    var coin:Node;
-
-    if ( player.isHuman() ) {
-        coin = Ellipse {
-                radiusX: width/2 - 8
-                radiusY: height/2 - 8
-                centerX: width/2
-                centerY: height/2
-                fill: Color.INDIANRED
-            }
-    }
-    
-    if ( player.isAI() ) {
-        coin = Ellipse {
-                radiusX: width/2 - 8
-                radiusY: height/2 - 8
-                centerX: width/2
-                centerY: height/2
-                fill: Color.DARKCYAN
-            }
-    }
-
-    return coin;
-}
 
 /**
  * The board class represents the rectangle area with the matrix of holes in it; with coins falling down
@@ -124,16 +32,11 @@ public class Board extends CustomNode {
 
     public-init var game: Game;
 
-    def container:Panel = Panel {
-                                    content: Rectangle {
-                                        width: boardWidth
-                                        height: boardHeight
-                                        fill: Color.BLANCHEDALMOND
-                                        onMouseClicked: function( event:MouseEvent ) :Void {
-                                            game.startRound();
-                                        }
-                                    }
-                                };
+    public-init var width:Integer;
+
+    public-init var height:Integer;
+
+    def container:Panel = Panel {};
 
     override protected function create(): Node {
         container;
@@ -155,16 +58,14 @@ public class Board extends CustomNode {
     var cellNode:Node;
 
     function rebuildContent( round:Integer ) :Void {
-        print("Building grid ... ");
-
         // cell sizing
-        cellWidth  = ( boardWidth  / game.grid.columns ) as Integer;
-        cellHeight = ( boardHeight / game.grid.rows ) as Integer;
+        cellWidth  = ( width  / game.grid.columns ) as Integer;
+        cellHeight = ( height / game.grid.rows ) as Integer;
 
         // coin nodes
-        coinHumanPlayer = createCoinNode(cellWidth, cellHeight, round, game.humanPlayer);
-        coinAIPlayer    = createCoinNode(cellWidth, cellHeight, round, game.aiPlayer);
-        cellNode        = createCellNode(cellWidth, cellHeight, round);
+        coinHumanPlayer = NodeFactory.createCoinNode(cellWidth, cellHeight, round, game.humanPlayer);
+        coinAIPlayer    = NodeFactory.createCoinNode(cellWidth, cellHeight, round, game.aiPlayer);
+        cellNode        = NodeFactory.createCellNode(cellWidth, cellHeight, round);
 
         // creating content
         container.content = Tile {
@@ -182,7 +83,10 @@ public class Board extends CustomNode {
 
                     def cell = game.grid.getCell( column, row )
 
-                    var player = bind cell.player on replace {
+                    // TODO Why isn't the binding always working ? In Grid a player is assigned to
+                    //      to the cell but sometimes the binding doesn't fire at all.
+                    def player = bind cell.player on replace {
+                        println("Cell player changes ! {cell} {player}");
                         if ( player != null ) {//if ( isInitialized( player ) ) {
                             var coin:Node;
                             if ( player.isHuman() ) {
@@ -191,11 +95,12 @@ public class Board extends CustomNode {
                             if ( player.isAI() ) {
                                 coin = Duplicator.duplicate ( coinAIPlayer );
                             }
+                            println("Adding coin {coin} to game");
                             insert coin into stack.content;
                         }
                     }
 
-                    var win = bind cell.winning on replace {
+                    def win = bind cell.winning on replace {
                         if ( win ) {
                             def coin = stack.content[sizeof stack.content - 1];
                             Timeline {
@@ -218,16 +123,14 @@ public class Board extends CustomNode {
 
 
                     onMouseClicked: function( event:MouseEvent ) :Void {
-                        if ( currentPlayer.isHuman() ) {
+                        // only humans can click on the board to play WHILE the game is ongoing !!!
+                        if ( currentPlayer.isHuman() and game.turn > 0 ) {
                             (currentPlayer as Model.HumanPlayer).play( cell.column );
                         }
                     }
                 }
             }
         }
-
-        println("built !");
-        this.doLayout();
     }
 }
 

@@ -104,6 +104,11 @@ public class Game {
         humanPlayer.onSpeak = onSpeak;
     }
 
+    public function prepareNextRound() :Void {
+        resetToRound( round + 1 );
+    }
+
+
     public function startRound() :Void {
         if ( turn == 0 ) {
             nextTurn();
@@ -143,6 +148,7 @@ public class Game {
         println("Current player: {currentPlayer.name}");
     // says the round is initialized
         turn = 0;
+        this.round = round;
         needsInitialisation = false;
     }
 
@@ -153,8 +159,7 @@ public class Game {
     function nextTurn() :Void {
         // reset to the next round
         if ( needsInitialisation ) {
-            resetToRound( round + 1 );
-            round++;
+            prepareNextRound();
         }
 
         // start a new turn
@@ -268,7 +273,14 @@ public class Grid {
         // valid move
         if ( Sequences.indexOf(availableColumns(), column) != -1 ) {
             var freeCellsInColumn = getColumn( column )[ x | x.player == null ];
-            freeCellsInColumn[ sizeof freeCellsInColumn - 1 ].player = player;
+            def firstCell = freeCellsInColumn[ sizeof freeCellsInColumn - 1 ];
+            if ( firstCell.player == null ) {
+                println("Setting player of cell {firstCell} to {player}");
+                firstCell.player = player;
+            }
+            else {
+                println("????");
+            }
             return true;
         }
         // invalid move
