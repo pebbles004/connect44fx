@@ -28,8 +28,8 @@ def winningPlayer = bind game.winningPlayer on replace {
     }
 };
 
-def startMessage = NodeFactory.createMessageNode( WIDTH, HEIGHT, "Click to start the game", initRound );
-def boardNode    = NodeFactory.createBoardNode(WIDTH, HEIGHT, game);
+def startMessage = View.createMessageNode( WIDTH, HEIGHT, "Click to start the game", initRound );
+def boardNode    = View.createBoardNode(WIDTH, HEIGHT, game);
 def stack:Stack = Stack {
     width: WIDTH
     height: HEIGHT
@@ -51,7 +51,7 @@ public function run() :Void {
 function initRound( event:MouseEvent ) :Void {
     clearBoard();
     game.prepareNextRound();
-    def messageNode = NodeFactory.createRoundStartMessageNode(WIDTH - 100, HEIGHT - 200, game, startRound );
+    def messageNode = View.createRoundStartMessageNode(WIDTH - 100, HEIGHT - 200, game, startRound );
     insert messageNode into stack.content;
 }
 
@@ -61,7 +61,7 @@ function startRound( event:MouseEvent ) :Void {
 }
 
 function playerWins( player:Player ) :Void {
-    def messageNode = NodeFactory.createMessageNode(WIDTH - 100, HEIGHT - 200, "Player {player.name} wins this round !", initRound );
+    def messageNode = View.createMessageNode(WIDTH - 100, HEIGHT - 200, "Player {player.name} wins this round !", initRound );
     insert messageNode into stack.content;
 }
 
