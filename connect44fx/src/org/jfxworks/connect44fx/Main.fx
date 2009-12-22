@@ -62,6 +62,7 @@ function startRound( event:MouseEvent ) :Void {
 
 function playerWins( player:Player ) :Void {
     def messageNode = View.createMessageNode(WIDTH - 100, HEIGHT - 200, "Player {player.name} wins this round !", initRound );
+    messageNode.opacity = .5;
     insert messageNode into stack.content;
 }
 

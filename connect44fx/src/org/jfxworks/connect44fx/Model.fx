@@ -198,16 +198,16 @@ public class Game {
         for ( x in [ 1 .. coinsNeededToWin ] ) {
             winningSequence = "{winningSequence}{currentPlayer.type}";
         }
-        var pattern = grid.findPattern(winningSequence);
+        def patterns = grid.findPattern(winningSequence);
 
-        if ( pattern != null ) {
-            for ( cell in pattern ) {
+        if ( sizeof patterns > 0 ) {
+            for ( cell in patterns[0].cells ) {
                 cell.winning = true;
             }
-            winningPlayer = pattern[0].player;
+            winningPlayer = patterns[0].cells[0].player;
         }
 
-        return pattern != null;
+        return (sizeof patterns > 0);
     }
 
 }
@@ -314,15 +314,29 @@ public class Grid {
         }
     }
 
-    // TODO extend the patterns to wildcards
-    protected function findPattern( pattern:String ) :Cell[] {
+    /**
+     * Perform pattern matching on the contents of the grid. This is used to find a winning sequence
+     * and to allow AI players to look for specific situations.
+     *
+     * H       : Coin of the human player
+     * A       : Coin of the AI player
+     * <blank> : No coin just yet / Must be empty
+     */
+    protected function findPattern( pattern:String ) :CellSequence[] {
+
+        var sequences:CellSequence[] = [];
+
         for ( sequence in cellSequences ) {
             var pos = sequence.pattern.indexOf( pattern );
-            if ( pos != -1 ) {
-                return sequence.cells[ pos .. pos + pattern.length() - 1 ];
+            while ( pos != -1 ) {
+                insert CellSequence {
+                    cells: sequence.cells[ pos .. pos + pattern.length() - 1 ];
+                } into sequences;
+                pos = sequence.pattern.indexOf( pattern, pos + pattern.length() );
             }
         }
-        return null;
+
+        return sequences;
     }
 }
 
