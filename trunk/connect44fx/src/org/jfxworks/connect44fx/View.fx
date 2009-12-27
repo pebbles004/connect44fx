@@ -20,11 +20,11 @@ import javafx.fxd.Duplicator;
 import javafx.scene.CustomNode;
 import javafx.scene.layout.Panel;
 import javafx.scene.layout.Tile;
-import javafx.scene.transform.Scale;
-import javafx.scene.transform.Translate;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.shape.ShapeSubtract;
 import org.jfxworks.connect44fx.templates.Level1Cell;
+import java.lang.UnsupportedOperationException;
+import javafx.scene.layout.VBox;
 
 
 // EXPERIMENTAL : Set this to false to for generated classes of InkScape.
@@ -53,7 +53,7 @@ public function createMessageNode(width: Integer, height: Integer, message: Stri
 }
 
 public function createRoundStartMessageNode(width: Integer, height: Integer, game: Game, onClick: function(: MouseEvent): Void) {
-    var message = "Round {game.round}\nBoard is {game.grid.columns} by {game.grid.rows}\nAligned coins needed {game.coinsNeededToWin}\nYour opponent {game.aiPlayer.name}\nStarting player: {game.currentPlayer.name}";
+    var message = "Round {game.currentRound.round + 1}\nBoard is {game.grid.columns} by {game.grid.rows}\nAligned coins needed {game.currentRound.coinsNeededToWin}\nYour opponent {game.aiPlayer.name}\nStarting player: {game.currentPlayer.name}";
     createMessageNode(width, height, message, onClick);
 }
 
@@ -67,7 +67,7 @@ public public function createBoardNode(width: Integer, height: Integer, game: Ga
 }
 
 // TODO use a resource bundle for this
-function createCellNode(width: Integer, height: Integer, round: Integer, cell: Cell, humanCoin:Node, aiCoin:Node ): Node {
+function createCellNode(width: Integer, height: Integer, round: Round, cell: Cell, humanCoin:Node, aiCoin:Node ): Node {
     CellNode {
         width: width
         height: height
@@ -78,7 +78,7 @@ function createCellNode(width: Integer, height: Integer, round: Integer, cell: C
 }
 
 // TODO use a resource bundle for this
-function createCoinNode(width: Integer, height: Integer, round: Integer, player: Player): Node {
+function createCoinNode(width: Integer, height: Integer, round: Round, player: Player): Node {
     var coin: Node;
 
     if (player.isHuman()) {
@@ -121,15 +121,15 @@ class Board extends CustomNode {
         container;
     }
 
-    var currentRound = bind game.round on replace {
-                if (currentRound > 0) {
+    def currentRound = bind game.currentRound on replace {
+                if ( currentRound != null ) {
                     rebuildContent(currentRound);
                 }
             }
 
-    var currentPlayer = bind game.currentPlayer;
+    def currentPlayer = bind game.currentPlayer;
 
-    function rebuildContent(round: Integer): Void {
+    function rebuildContent(round: Round): Void {
         // cell sizing
         var cellWidth = (width / game.grid.columns) as Integer;
         var cellHeight = (height / game.grid.rows) as Integer;
@@ -283,3 +283,17 @@ function normalizeNode( width:Integer, height:Integer, node:Node ) :Void {
 //    node.translateY = -node.layoutBounds.minY;
 }
 
+
+
+
+
+class PlayerNode extends CustomNode {
+
+    public-init var player:Player;
+
+    override protected function create () : Node {
+        VBox {
+            content: []
+        }
+    }
+}
