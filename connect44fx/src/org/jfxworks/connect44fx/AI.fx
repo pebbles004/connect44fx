@@ -9,41 +9,42 @@
 
 package org.jfxworks.connect44fx;
 
-import org.jfxworks.connect44fx.Model.Player;
-import java.lang.UnsupportedOperationException;
-import org.jfxworks.connect44fx.Model.Game;
+import org.jfxworks.connect44fx.Model.*;
 import java.util.Random;
-import java.lang.Thread;
 
 def RANDOM:Random = Random{};
 
 var AI_PLAYERS:AIPlayer[] = [];
 
-public function createAIPlayer( level:Integer ) :Player {
+public function createAIPlayer( round:Round ) :Player {
     if ( sizeof AI_PLAYERS == 0 ) {
         initializeAIPlayers();
     }
 
-    if ( AI_PLAYERS[ level ] == null ) {
-        return AI_PLAYERS[ sizeof AI_PLAYERS - 1 ];
+    var player:AIPlayer;
+
+    if ( AI_PLAYERS[ round.round ] == null ) {
+        player = AI_PLAYERS[ sizeof AI_PLAYERS - 1 ];
+    }
+    else {
+        player = AI_PLAYERS[ round.round ];
     }
 
-    return AI_PLAYERS[ level ];
+    player.name = round.aiPlayerName;
+    player.imageUrl = round.imageUrl;
+
+    return player;
 }
 
 function initializeAIPlayers() :Void {
     // level 0
-    insert CarelessAI {
-        name: "Sinclair ZX81 1KB"
-    } into AI_PLAYERS;
+    insert CarelessAI {} into AI_PLAYERS;
     // level 1
     insert CarelessAI {
-        name: "Sinclair ZX Spectrum 48KB"
         pretendThinkingTimeVariation: 500ms
     } into AI_PLAYERS;
     // level 2
     insert CarelessAI {
-        name: "Sinclair QL 128MB"
         pretendThinkingTime: 2s
         pretendThinkingTimeVariation: 500ms
     } into AI_PLAYERS;

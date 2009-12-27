@@ -8,17 +8,21 @@
 
 package org.jfxworks.connect44fx;
 
-import java.lang.IllegalStateException;
 import java.util.Random;
 import javafx.util.Sequences;
-import org.jfxworks.connect44fx.Model.*;
-import java.lang.Exception;
+import java.io.FileInputStream;
+import javafx.util.Properties;
+import javafx.io.Storage;
 
 def RANDOM = Random{};
 
-public def PLAYER_TYPE_HUMAN = "H";
+def PLAYER_TYPE_HUMAN = "H";
 
-public def PLAYER_TYPE_AI    = "A";
+def PLAYER_TYPE_AI    = "A";
+
+// Make the ROUNDS variable immutable
+public def ROUNDS = bind _ROUNDS;
+var _ROUNDS:Round[];
 
 /**
  * Class describing the conceptual game.
@@ -26,16 +30,6 @@ public def PLAYER_TYPE_AI    = "A";
  * The aim is to allow visual components to bind with the various state variables of this object.
  */
 public class Game {
-
-    //TODO get this data from from a resource bundle
-    public-read var rows = 6;
-
-    //TODO get this data from from a resource bundle
-    public-read var columns = 7;
-
-    //TODO get this data from from a resource bundle
-    public-read var coinsNeededToWin = 4;
-
     /**
      * Who's the human player - settable at initialization time
      */
@@ -67,9 +61,10 @@ public class Game {
     public-read var gameFinished:Boolean = false;
 
     /**
-     * Current round of the game - 1 is the first round.
+     * Current round of the game
      */
-    public-read var round = 0;
+    var rounds: Round[];
+    public-read var currentRound:Round;
 
     /**
      * Current turn in the current round of the game - 1 for the first turn. Can not be larger
@@ -102,10 +97,35 @@ public class Game {
     postinit {
         // redirect human speach
         humanPlayer.onSpeak = onSpeak;
+
+        // initialize the rounds sequence
+        def inputStream = this.getClass().getResourceAsStream("resources/rounds.properties");
+        def properties  = Properties {};
+        properties.load(inputStream);
+
+        var round = 0;
+        while( properties.get("round.{round}") != null ) {
+            def values = properties.get("round.{round}").split(",");
+            insert Round {
+                round: round;
+                aiPlayerName: values[0];
+                imageUrl: "{__DIR__}resources/{values[1]}";
+                rows: Integer.parseInt(values[2]);
+                columns: Integer.parseInt(values[3]);
+                coinsNeededToWin: Integer.parseInt(values[4]);
+            } into rounds;
+            round++;
+        }
     }
 
     public function prepareNextRound() :Void {
-        resetToRound( round + 1 );
+        if ( currentRound == null ) {
+            resetToRound( rounds[0] );
+        }
+        else {
+            resetToRound( rounds[ currentRound.round + 1 ] );
+        }
+
     }
 
 
@@ -119,20 +139,15 @@ public class Game {
      * Prepare the game to start the given round. But don't start it just yet. It's always
      * the human player who kicks off a round. Even if the AI player is starting
      */
-    function resetToRound( round:Integer ) :Void {
-        println("Reset game to round {round}");
-    // TODO get this from a resource bundle of some kind
-        rows = 6;
-        columns = 7;
-        coinsNeededToWin = 4;
+    function resetToRound( round:Round ) :Void {
     // select new AI player
         aiPlayer = AI.createAIPlayer( round );
         aiPlayer.onSpeak = onSpeak;
     // create new grid
         def tempGrid = Grid {
-            rows: rows;
-            columns: columns;
-            minimumCellSequenceLength: coinsNeededToWin
+            rows: round.rows;
+            columns: round.columns;
+            minimumCellSequenceLength: round.coinsNeededToWin
         }
         grid = tempGrid;
         
@@ -145,10 +160,9 @@ public class Game {
         else {
             currentPlayer = aiPlayer;
         }
-        println("Current player: {currentPlayer.name}");
     // says the round is initialized
         turn = 0;
-        this.round = round;
+        currentRound = round;
         needsInitialisation = false;
     }
 
@@ -164,7 +178,7 @@ public class Game {
 
         // start a new turn
         turn++;
-        if ( turn < rows * columns ) {
+        if ( sizeof grid.availableColumns() > 0 ) {
             currentPlayer.thinkAboutNextMove( this, playerChoses );
         }
         else {
@@ -195,7 +209,7 @@ public class Game {
 
     function winningSequenceFound() :Boolean {
         var winningSequence = "";
-        for ( x in [ 1 .. coinsNeededToWin ] ) {
+        for ( x in [ 1 .. currentRound.coinsNeededToWin ] ) {
             winningSequence = "{winningSequence}{currentPlayer.type}";
         }
         def patterns = grid.findPattern(winningSequence);
@@ -211,6 +225,20 @@ public class Game {
     }
 
 }
+
+/**
+ * Contains the meta-data of one Round in the game. Each round opposes the human player 
+ * against an AI player of a certain level and a grid with a certain size.
+ */
+public class Round {
+    public-init var round:Integer;
+    public-init var aiPlayerName:String;
+    public-init var imageUrl:String;
+    public-init var rows:Integer;
+    public-init var columns:Integer;
+    public-init var coinsNeededToWin:Integer;
+}
+
 
 /**
  * Represents the grid of the game.
@@ -378,7 +406,7 @@ public abstract class Player {
     /**
      * Name of the player
      */
-    public-init var name;
+    public var name;
 
    /**
     * A one-character label indicating what type of player this is.
@@ -390,7 +418,7 @@ public abstract class Player {
     /**
      * URL to the image of the player.
      */
-    public-init var imageUrl = "?";
+    public var imageUrl = "?";
 
    /**
     * Callback to handle comments of players.
