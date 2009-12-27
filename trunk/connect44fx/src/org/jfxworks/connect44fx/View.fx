@@ -16,6 +16,7 @@ import javafx.scene.shape.Ellipse;
 import org.jfxworks.connect44fx.Model.*;
 import javafx.animation.Interpolator;
 import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
 import javafx.fxd.Duplicator;
 import javafx.scene.CustomNode;
 import javafx.scene.layout.Panel;
@@ -23,7 +24,6 @@ import javafx.scene.layout.Tile;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.shape.ShapeSubtract;
 import org.jfxworks.connect44fx.templates.Level1Cell;
-import java.lang.UnsupportedOperationException;
 import javafx.scene.layout.VBox;
 
 
@@ -157,6 +157,11 @@ class Board extends CustomNode {
                                         }
                                       };
 
+                node.onMouseWheelMoved = function ( event:MouseEvent ) :Void {
+                    game.grid.test();
+                }
+
+
                 // return this node instance
                 node
             }
@@ -179,7 +184,6 @@ class CellNode extends CustomNode {
     var content:Group;
 
     def player = bind cell.player on replace {
-        println("Cell player changes ! {cell} {player}");
         if (player != null) {//if ( isInitialized( player ) ) {
             if (player.isHuman()) {
                 insert Duplicator.duplicate( humanCoin ) after content.content[0];
@@ -210,6 +214,34 @@ class CellNode extends CustomNode {
             }.play();
         }
     }
+
+    def testing = bind cell.testing on replace {
+        if ( testing ) {
+            def coin = content.content[1];
+            Timeline {
+                autoReverse: true
+                keyFrames: [
+                               at (0s) {
+                                   coin.scaleX => 1.0 tween Interpolator.EASEBOTH
+                               }
+                               at (500ms) {
+                                   coin.scaleX => 0.0 tween Interpolator.EASEBOTH
+                               }
+                               at (1s) {
+                                   coin.scaleX => -1.0 tween Interpolator.EASEBOTH
+                               }
+                               KeyFrame {
+                                  time: 1s
+                                  action: function() :Void {
+                                      cell.testing = false;
+                                  }
+                               }
+
+                           ]
+            }.play();
+        }
+    }
+
 
 
     public override function create(): Node {

@@ -10,19 +10,16 @@ package org.jfxworks.connect44fx;
 
 import java.util.Random;
 import javafx.util.Sequences;
-import java.io.FileInputStream;
 import javafx.util.Properties;
-import javafx.io.Storage;
+import java.lang.Thread;
+import java.lang.Comparable;
+import java.lang.UnsupportedOperationException;
 
 def RANDOM = Random{};
 
 def PLAYER_TYPE_HUMAN = "H";
 
 def PLAYER_TYPE_AI    = "A";
-
-// Make the ROUNDS variable immutable
-public def ROUNDS = bind _ROUNDS;
-var _ROUNDS:Round[];
 
 /**
  * Class describing the conceptual game.
@@ -200,7 +197,6 @@ public class Game {
             else {
                 // select the other player
                 currentPlayer = if ( currentPlayer instanceof HumanPlayer ) aiPlayer else humanPlayer;
-                println("Player is now {currentPlayer} {currentPlayer.name}");
                 // asks the player to make his next move
                 nextTurn();
             }
@@ -275,13 +271,13 @@ public class Grid {
         // diagonals
         for ( column in [ (-rows-1) .. <columns ] ) {
             // top/left to bottom/right
-            var diag1 =  for ( row in [ 0 .. <rows ] ) {
+            var diag1 =  for (row in [ 0 .. <rows ]) {
                 getCell( column + row, row );
             };
             insert CellSequence{ cells:diag1 } into cellSequences;
             // bottom/left to top/right
-            var diag2 = for ( row in [ (rows-1) .. 0 step -1 ] ) {
-                getCell( column + row, row );
+            var diag2 = for (row in [ 0 .. <rows ]) {
+                getCell( column + row, rows - row - 1 );
             };
             insert CellSequence{ cells:diag2 } into cellSequences;
         }
@@ -292,6 +288,10 @@ public class Grid {
             delete null from sequence.cells;
         }
         cellSequences = cellSequences[ seq | sizeof seq.cells >= minimumCellSequenceLength ];
+
+        for ( sequence in cellSequences ) {
+            sequence.cells = (Sequences.sort( sequence.cells ) as Cell[]);
+        }
     }
 
    /**
@@ -303,7 +303,6 @@ public class Grid {
             var freeCellsInColumn = getColumn( column )[ x | x.player == null ];
             def firstCell = freeCellsInColumn[ sizeof freeCellsInColumn - 1 ];
             if ( firstCell.player == null ) {
-                println("Setting player of cell {firstCell} to {player}");
                 firstCell.player = player;
             }
             else {
@@ -366,14 +365,42 @@ public class Grid {
 
         return sequences;
     }
+
+    public function test() :Void {
+        println("Testing grid...");
+        for ( seq in cellSequences ) {
+            println("  sequence {indexof seq}");
+            for ( cell in seq.cells ) {
+                cell.testing = true;
+            }
+        }
+    }
 }
 
-public class Cell {
+public class Cell extends Comparable {
     public-init var player:Player;
     public-init var column:Integer;
     public-init var row:Integer;
 
     public-read var winning:Boolean = false;
+    public      var testing:Boolean = false;
+
+    override public function compareTo ( _other : Object ) : Integer {
+        def other = _other as Cell;
+        if ( column > other.column ) {
+            return 1;
+        }
+        if ( column < other.column ) {
+            return -1;
+        }
+        if ( row < other.row ) {
+            return 1;
+        }
+        if ( row > other.row ) {
+            return -1;
+        }
+        return 0;
+    }
 }
 
 class CellSequence {
