@@ -67,7 +67,7 @@ public public function createBoardNode(width: Integer, height: Integer, game: Ga
 }
 
 // TODO use a resource bundle for this
-function createCellNode(width: Integer, height: Integer, round: Round, cell: Cell, humanCoin:Node, aiCoin:Node ): Node {
+function createCellNode(width: Integer, height: Integer, round: Integer, cell: Cell, humanCoin:Node, aiCoin:Node ): Node {
     CellNode {
         width: width
         height: height
@@ -78,7 +78,7 @@ function createCellNode(width: Integer, height: Integer, round: Round, cell: Cel
 }
 
 // TODO use a resource bundle for this
-function createCoinNode(width: Integer, height: Integer, round: Round, player: Player): Node {
+function createCoinNode(width: Integer, height: Integer, round: Integer, player: Player): Node {
     var coin: Node;
 
     if (player.isHuman()) {
@@ -121,15 +121,21 @@ class Board extends CustomNode {
         container;
     }
 
-    def currentRound = bind game.currentRound on replace {
-                if ( currentRound != null ) {
-                    rebuildContent(currentRound);
-                }
-            }
+    postinit {
+        game.addEventListener(game.EVENT_TYPE_ROUND_START, rebuildContent );
+        game.addEventListener(game.EVENT_TYPE_TURN_START, turnStart );
+    }
 
-    def currentPlayer = bind game.currentPlayer;
+    var currentPlayer:Player;
+    var currentTurn:Integer = 0;
 
-    function rebuildContent(round: Round): Void {
+    function turnStart( turn:Integer, player:Player, game:Game ) :Void {
+        currentPlayer = player;
+        currentTurn   = turn;
+    }
+
+
+    function rebuildContent(round: Integer, game:Game): Void {
         // cell sizing
         var cellWidth = (width / game.grid.columns) as Integer;
         var cellHeight = (height / game.grid.rows) as Integer;
@@ -152,7 +158,7 @@ class Board extends CustomNode {
 
                 node.onMouseClicked = function( event:MouseEvent ) :Void {
                                         // only humans can click on the board to play WHILE the game is ongoing !!!
-                                        if ( currentPlayer.isHuman() and game.turn > 0 ) {
+                                        if ( currentPlayer.isHuman() and currentTurn > 0 ) {
                                             (currentPlayer as Model.HumanPlayer).play( cell.column );
                                         }
                                       };
@@ -214,35 +220,6 @@ class CellNode extends CustomNode {
             }.play();
         }
     }
-
-    def testing = bind cell.testing on replace {
-        if ( testing ) {
-            def coin = content.content[1];
-            Timeline {
-                autoReverse: true
-                keyFrames: [
-                               at (0s) {
-                                   coin.scaleX => 1.0 tween Interpolator.EASEBOTH
-                               }
-                               at (500ms) {
-                                   coin.scaleX => 0.0 tween Interpolator.EASEBOTH
-                               }
-                               at (1s) {
-                                   coin.scaleX => -1.0 tween Interpolator.EASEBOTH
-                               }
-                               KeyFrame {
-                                  time: 1s
-                                  action: function() :Void {
-                                      cell.testing = false;
-                                  }
-                               }
-
-                           ]
-            }.play();
-        }
-    }
-
-
 
     public override function create(): Node {
 

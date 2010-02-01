@@ -26,7 +26,16 @@ def PLAYER_TYPE_AI    = "A";
  *
  * The aim is to allow visual components to bind with the various state variables of this object.
  */
-public class Game {
+public class Game extends EventDispatcher {
+
+    public def EVENT_TYPE_GAME_INIT   = "gameInitialized";
+    public def EVENT_TYPE_ROUND_START = "roundStarted";
+    public def EVENT_TYPE_TURN_START  = "turnStarted";
+    public def EVENT_TYPE_GAME_END    = "gameTerminated";
+    public def EVENT_TYPE_SPEAKING    = "playerIsSpeaking";
+    public def EVENT_TYPE_WIN         = "playerIsWinning";
+    public def EVENT_TYPE_DRAW        = "gameDraw";
+
     /**
      * Who's the human player - settable at initialization time
      */
@@ -43,21 +52,6 @@ public class Game {
     public-read var currentPlayer:Player;
 
     /**
-     * Who's winning ?
-     */
-    public-read var winningPlayer:Player;
-
-   /**
-    * indicates whether the current round has ended in a draw - nobody won.
-    */
-    public-read var draw = false;
-
-   /**
-    * Indicates whether the game has ended - the human player was beaten
-    */
-    public-read var gameFinished:Boolean = false;
-
-    /**
      * Current round of the game
      */
     var rounds: Round[];
@@ -69,22 +63,12 @@ public class Game {
      *
      * Reset to 0 at each new round.
      */
-    public-read var turn = 0;
+    var turn = 0;
 
     /**
      * The conceptual grid that's behind the game. Reintialized at each new round
      */
     public-read var grid:Grid;
-
-    /**
-     * Callback function in case a player says something
-     */
-    public-init var onSpeak:function (:Player, :String) :Void;
-
-    /**
-     * Callback function in case the game communicates something
-     */
-    public-init var onMessage:function ( :String ):Void;
 
     /**
      * Flag to indicate the next turn needs to reinitialize the next round
@@ -93,7 +77,7 @@ public class Game {
 
     postinit {
         // redirect human speach
-        humanPlayer.onSpeak = onSpeak;
+        addEventListener(EVENT_TYPE_SPEAKING, humanPlayer.onSpeak);
 
         // initialize the rounds sequence
         def inputStream = this.getClass().getResourceAsStream("resources/rounds.properties");
@@ -113,6 +97,8 @@ public class Game {
             } into rounds;
             round++;
         }
+
+        dispatch(EVENT_TYPE_GAME_INIT, this);
     }
 
     public function prepareNextRound() :Void {
@@ -127,6 +113,7 @@ public class Game {
 
 
     public function startRound() :Void {
+        dispatch(EVENT_TYPE_ROUND_START, currentRound.round, this);
         if ( turn == 0 ) {
             nextTurn();
         }
@@ -138,8 +125,12 @@ public class Game {
      */
     function resetToRound( round:Round ) :Void {
     // select new AI player
+        if ( aiPlayer != null ) {
+            removeEventListener(EVENT_TYPE_SPEAKING, aiPlayer.onSpeak );
+        }
         aiPlayer = AI.createAIPlayer( round );
-        aiPlayer.onSpeak = onSpeak;
+        addEventListener(EVENT_TYPE_SPEAKING, aiPlayer.onSpeak);
+        
     // create new grid
         def tempGrid = Grid {
             rows: round.rows;
@@ -149,8 +140,6 @@ public class Game {
         grid = tempGrid;
         
     // reset various vars
-        winningPlayer = null;
-        draw = false;
         if ( RANDOM.nextBoolean() ) {
             currentPlayer = humanPlayer;
         }
@@ -175,11 +164,14 @@ public class Game {
 
         // start a new turn
         turn++;
+        dispatch(EVENT_TYPE_TURN_START, turn, currentPlayer, this );
+
+        // ask the next player to choose a column
         if ( sizeof grid.availableColumns() > 0 ) {
             currentPlayer.thinkAboutNextMove( this, playerChoses );
         }
         else {
-            draw = true;
+            dispatch(EVENT_TYPE_DRAW, this);
             needsInitialisation = true;
         }
     }
@@ -191,7 +183,11 @@ public class Game {
         // tell the game the next coin coming into the selected column
         if ( grid.addCoinIntoColumn(column, currentPlayer) ) {
             if ( winningSequenceFound() ) {
-                winningPlayer = currentPlayer;
+                dispatch( EVENT_TYPE_WIN, currentPlayer, this );
+                if ( currentPlayer.isAI() ) {
+                    dispatch( EVENT_TYPE_GAME_END, this );
+                }
+
                 needsInitialisation = true;
             }
             else {
@@ -214,7 +210,6 @@ public class Game {
             for ( cell in patterns[0].cells ) {
                 cell.winning = true;
             }
-            winningPlayer = patterns[0].cells[0].player;
         }
 
         return (sizeof patterns > 0);
