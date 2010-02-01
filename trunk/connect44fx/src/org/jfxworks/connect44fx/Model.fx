@@ -22,9 +22,9 @@ def RANDOM = Random{};
 // creates the same numbers for every player
 def ROUND_RANDOM = new Random( 123456789 );
 
-def PLAYER_TYPE_HUMAN = "H";
+public def PLAYER_TYPE_HUMAN = "H";
 
-def PLAYER_TYPE_AI    = "A";
+public def PLAYER_TYPE_AI    = "A";
 
 /**
  * Class describing the conceptual game.
@@ -436,7 +436,7 @@ public class Cell extends Comparable {
     }
 }
 
-class CellSequence {
+public class CellSequence {
     public-read var cells:Cell[] on replace {
                                     buildPatternString();
                                  };
