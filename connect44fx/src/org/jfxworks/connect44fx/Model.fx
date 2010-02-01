@@ -14,8 +14,13 @@ import javafx.util.Properties;
 import java.lang.Thread;
 import java.lang.Comparable;
 import java.lang.UnsupportedOperationException;
+import javafx.util.Math;
 
 def RANDOM = Random{};
+
+// we're using a fixed seed to make sure the generator 
+// creates the same numbers for every player
+def ROUND_RANDOM = new Random( 123456789 );
 
 def PLAYER_TYPE_HUMAN = "H";
 
@@ -102,13 +107,46 @@ public class Game extends EventDispatcher {
     }
 
     public function prepareNextRound() :Void {
-        if ( currentRound == null ) {
-            resetToRound( rounds[0] );
-        }
-        else {
-            resetToRound( rounds[ currentRound.round + 1 ] );
+        def index = if ( currentRound == null ) 0 else currentRound.round + 1;
+        var round = rounds[ index ];
+
+        // We ran out of defined rounds !
+        // These humans ... we'll make it a bit harder then... :-)
+        if ( round == null ) {
+            // 10% chance the grid will increase in size
+            var modifyGridSize = ( ROUND_RANDOM.nextInt( 100 ) <= 5 );
+            // 3% chance to increase the number of coins needed to win
+            var increaseCoins  = ( ROUND_RANDOM.nextInt( 100 ) <= 3 );
+
+            // Generate a new round.
+            // TODO Choose a name and picture at random
+            round = Round {
+                round: index
+                aiPlayerName: generateName( ROUND_RANDOM );
+                rows: Math.min(20, if ( modifyGridSize ) currentRound.rows+1 else currentRound.rows );
+                columns: Math.min(21, if ( modifyGridSize ) currentRound.columns+1 else currentRound.columns );
+                coinsNeededToWin: Math.min(10, if ( increaseCoins ) currentRound.coinsNeededToWin+1 else currentRound.coinsNeededToWin );
+            }
         }
 
+        resetToRound(round);
+    }
+
+    // TODO Find a better naming sceme.
+    //      Isn't there a list of "tough" names somewhere ?
+    function generateName( random:Random ) :String {
+        var name = "";
+        for ( index in [ 1 .. 3 ] ) {
+            name = "{name}{generateCharacter(random)}";
+        }
+        name = "{name}-{1000 + random.nextInt(8999)}";
+
+        return name;
+    }
+
+    function generateCharacter( random:Random ) :String {
+        var char:Character = 65 + random.nextInt(26);
+        return char.toString();
     }
 
 
