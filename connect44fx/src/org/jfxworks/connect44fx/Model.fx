@@ -11,10 +11,9 @@ package org.jfxworks.connect44fx;
 import java.util.Random;
 import javafx.util.Sequences;
 import javafx.util.Properties;
-import java.lang.Thread;
 import java.lang.Comparable;
-import java.lang.UnsupportedOperationException;
 import javafx.util.Math;
+import java.lang.System;
 
 def RANDOM = Random{};
 
@@ -36,6 +35,7 @@ public class Game extends EventDispatcher {
     public def EVENT_TYPE_GAME_INIT   = "gameInitialized";
     public def EVENT_TYPE_ROUND_START = "roundStarted";
     public def EVENT_TYPE_TURN_START  = "turnStarted";
+    public def EVENT_TYPE_TURN_END    = "turnEnded";
     public def EVENT_TYPE_GAME_END    = "gameTerminated";
     public def EVENT_TYPE_SPEAKING    = "playerIsSpeaking";
     public def EVENT_TYPE_WIN         = "playerIsWinning";
@@ -79,6 +79,11 @@ public class Game extends EventDispatcher {
      * Flag to indicate the next turn needs to reinitialize the next round
      */
     var needsInitialisation = true;
+
+    /**
+     * Score so far by the human player
+     */
+    public-read var humanScore = 0;
 
     postinit {
         // redirect human speach
@@ -203,6 +208,9 @@ public class Game extends EventDispatcher {
         // start a new turn
         turn++;
         dispatch(EVENT_TYPE_TURN_START, turn, currentPlayer, this );
+        if ( currentPlayer.isHuman() ) {
+            currentRound.humanStartTime = System.currentTimeMillis();
+        }
 
         // ask the next player to choose a column
         if ( sizeof grid.availableColumns() > 0 ) {
@@ -218,6 +226,12 @@ public class Game extends EventDispatcher {
      * Function callback for when a player selects a column to insert a coin into
      */
     function playerChoses( column:Integer ) {
+        // keep track of the score
+        if ( currentPlayer.isHuman() ) {
+            currentRound.humanTimeSpend += (System.currentTimeMillis() - currentRound.humanStartTime);
+            humanScore += (200 - (currentRound.humanTimeSpend/1000) );
+        }
+
         // tell the game the next coin coming into the selected column
         if ( grid.addCoinIntoColumn(column, currentPlayer) ) {
             if ( winningSequenceFound() ) {
@@ -225,10 +239,14 @@ public class Game extends EventDispatcher {
                 if ( currentPlayer.isAI() ) {
                     dispatch( EVENT_TYPE_GAME_END, this );
                 }
+                else {
+                    dispatch( EVENT_TYPE_TURN_END, turn, currentPlayer, this );
+                }
 
                 needsInitialisation = true;
             }
             else {
+                dispatch( EVENT_TYPE_TURN_END, turn, currentPlayer, this );
                 // select the other player
                 currentPlayer = if ( currentPlayer instanceof HumanPlayer ) aiPlayer else humanPlayer;
                 // asks the player to make his next move
@@ -266,6 +284,8 @@ public class Round {
     public-init var rows:Integer;
     public-init var columns:Integer;
     public-init var coinsNeededToWin:Integer;
+    public-read var humanStartTime = 0;
+    public-read var humanTimeSpend = 0;
 }
 
 
