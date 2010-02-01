@@ -16,17 +16,12 @@ def HEIGHT = 342;
 
 var stage:Stage;
 
-def game = Game {
+def game:Game = Game {
     humanPlayer: HumanPlayer {
         name: "The CPU Grinder"
     }
 };
 
-def winningPlayer = bind game.winningPlayer on replace {
-    if ( winningPlayer != null ) {
-        playerWins(winningPlayer);
-    }
-};
 
 def startMessage = View.createMessageNode( WIDTH, HEIGHT, "Click to start the game", initRound );
 def boardNode    = View.createBoardNode(WIDTH, HEIGHT, game);
@@ -37,6 +32,9 @@ def stack:Stack = Stack {
 }
 
 public function run() :Void {
+    game.addEventListener( game.EVENT_TYPE_WIN, playerWins );
+
+
     stage = Stage {
         title : "Connect44FX - the ONLY game you need !"
         scene: Scene {
@@ -60,7 +58,7 @@ function startRound( event:MouseEvent ) :Void {
     game.startRound();
 }
 
-function playerWins( player:Player ) :Void {
+function playerWins( player:Player, game:Game ) :Void {
     def messageNode = View.createMessageNode(WIDTH - 100, HEIGHT - 200, "Player {player.name} wins this round !", initRound );
     messageNode.opacity = .5;
     insert messageNode into stack.content;
