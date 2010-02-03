@@ -82,7 +82,7 @@ public class SearchForDirectWin extends Tactics {
                     temp = "{temp}{playerType}";
                 }
             }
-            temp = temp.substring( length );
+            temp = temp.substring( 0, length );
             insert temp into patterns;
         }
 
