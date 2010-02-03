@@ -58,14 +58,25 @@ function startRound( event:MouseEvent ) :Void {
     game.startRound();
 }
 
-function playerWins( player:Player, game:Game ) :Void {
-    var message = "Player {player.name} wins this round !";
-    if ( player.isHuman() ) {
-        message = "{message}\nScore so far : {game.humanScore}";
-    }
+function endTheGame( event:MouseEvent ) :Void {
+    FX.exit();
+}
 
-    def messageNode = View.createMessageNode(WIDTH - 100, HEIGHT - 200, message, initRound );
-    messageNode.opacity = .5;
+
+function playerWins( player:Player, game:Game ) :Void {
+    var message = "";
+    var exit:function(event:MouseEvent):Void;
+
+    if ( player.isAI() ) {
+        message = "SHAME ON YOU !\n\nOutsmarted by a bunch of bytes...\n\nPlayer {player.name} has won.\n\nYour score {game.humanScore} points at round {game.currentRound.round+1}.\n\n\nClick here to exit the game.";
+        exit    = endTheGame;
+    }
+    else {
+        message = "You have won this round !\n\nYour score is now {game.humanScore} points.\n\nClick here to continue.";
+        exit = initRound;
+    }
+    def messageNode = View.createMessageNode(WIDTH - 100, HEIGHT - 200, message, exit );
+    //messageNode.opacity = .5;
     insert messageNode into stack.content;
 }
 
