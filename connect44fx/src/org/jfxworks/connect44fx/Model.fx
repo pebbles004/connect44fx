@@ -241,9 +241,8 @@ public class Game extends EventDispatcher {
                 }
                 else {
                     dispatch( EVENT_TYPE_TURN_END, turn, currentPlayer, this );
+                    needsInitialisation = true;
                 }
-
-                needsInitialisation = true;
             }
             else {
                 dispatch( EVENT_TYPE_TURN_END, turn, currentPlayer, this );
