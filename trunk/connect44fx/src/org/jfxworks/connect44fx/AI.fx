@@ -12,6 +12,9 @@ package org.jfxworks.connect44fx;
 import java.util.Random;
 import org.jfxworks.connect44fx.Tactics.*;
 import org.jfxworks.connect44fx.Model.*;
+import java.lang.Thread;
+import javafx.util.Math;
+import org.jfxtras.async.JFXWorker;
 
 def RANDOM:Random = Random{};
 
@@ -63,7 +66,7 @@ function initializeAIPlayers() :Void {
 
     // level 4
     insert AIPlayer {
-        pretendThinkingTime: 500s
+        pretendThinkingTime: 500ms
         pretendThinkingTimeVariation: 100ms
         tactics: SearchForDirectWin {
             applicationProbability: .5
@@ -191,32 +194,39 @@ class AIPlayer extends Player {
     def randomTactic = RandomChoice{};
 
     override public function thinkAboutNextMove( game:Game, onChose:function( :Integer ) :Void ) :Void  {
-        // TODO ASYNCHRONOUS !!!!!!!
+        def choiceCallback = onChose;
 
-// TODO Enable in real game
-//        if ( pretendThinkingTime.gt( 0s ) ) {
-//            def variation = pretendThinkingTimeVariation.toMillis();
-//            def sleep = pretendThinkingTime.toMillis() + RANDOM.nextInt( variation * 2 ) - variation;
-//            Thread.currentThread().sleep( sleep );
-//        }
+        def worker = JFXWorker{
+                         inBackground: function() {
+                            println("AI: Thinking .... ");
+                            game.aiIsThinking = true;
+                            //pretend we're thinking really hard
+                            if ( pretendThinkingTime.gt( 0s ) ) {
+                                def variation = pretendThinkingTimeVariation.toMillis();
+                                def sleep = pretendThinkingTime.toMillis() + RANDOM.nextInt( variation * 2 ) - variation;
+                                Thread.currentThread().sleep( Math.min(sleep,10000) );
+                            }
+                            // Run each tactic after each other. Once a tactic has chosen a
+                            // column the search is interrupted.
+                            var choice = Tactics.NO_CHOICE;
+                            for ( tactic in tactics ) {
+                                if ( choice == Tactics.NO_CHOICE ) {
+                                    choice = tactic.run(game);
+                                }
+                            }
 
-        // Run each tactic after each other. Once a tactic has chosen a
-        // column the search is interrupted.
-        var choice = Tactics.NO_CHOICE;
-        for ( tactic in tactics ) {
-            if ( choice == Tactics.NO_CHOICE ) {
-                choice = tactic.run(game);
-            }
-        }
+                            // Fallback to the elementary tactic as all other tactics have failed.
+                            if ( choice == Tactics.NO_CHOICE ) {
+                                choice = randomTactic.run( game );
+                            }
+                            println("AI: Thinking done !");
 
-        // Fallback to the elementary tactic as all other tactics have failed.
-        if ( choice == Tactics.NO_CHOICE ) {
-            onChose( randomTactic.run( game ) );
-        }
-        else {
-            onChose( choice );
-        }
-
+                            return choice;
+                         }
+                         onDone: function(result) {
+                             choiceCallback ( result as Integer );
+                         }
+                     };
     }
 }
 

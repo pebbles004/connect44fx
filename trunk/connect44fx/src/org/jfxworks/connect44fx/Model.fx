@@ -85,6 +85,8 @@ public class Game extends EventDispatcher {
      */
     public-read var humanScore = 0;
 
+    public var aiIsThinking = false;
+
     postinit {
         // redirect human speach
         addEventListener(EVENT_TYPE_SPEAKING, humanPlayer.onSpeak);
@@ -231,6 +233,10 @@ public class Game extends EventDispatcher {
             currentRound.humanTimeSpend += (System.currentTimeMillis() - currentRound.humanStartTime);
             humanScore += (200 - (currentRound.humanTimeSpend/1000) );
         }
+        else {
+            aiIsThinking = false;
+        }
+
 
         // tell the game the next coin coming into the selected column
         if ( grid.addCoinIntoColumn(column, currentPlayer) ) {

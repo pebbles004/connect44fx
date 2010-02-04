@@ -158,8 +158,13 @@ class Board extends CustomNode {
 
                 node.onMouseClicked = function( event:MouseEvent ) :Void {
                                         // only humans can click on the board to play WHILE the game is ongoing !!!
-                                        if ( currentPlayer.isHuman() and currentTurn > 0 ) {
-                                            (currentPlayer as Model.HumanPlayer).play( cell.column );
+                                        if ( currentPlayer.isHuman() and currentTurn > 0 and game.aiIsThinking == false ) {
+                                            if ( game.aiIsThinking ) {
+                                                println("AI : Hey ! I'm thinking you moron !");
+                                            }
+                                            else {
+                                                (currentPlayer as Model.HumanPlayer).play( cell.column );
+                                            }
                                         }
                                       };
 
