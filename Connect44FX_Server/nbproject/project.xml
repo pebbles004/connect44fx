@@ -50,6 +50,10 @@
                     <path-in-war>/</path-in-war>
                 </library>
                 <library dirs="200">
+                    <file>${file.reference.Connect44FX.jar.pack.gz}</file>
+                    <path-in-war>/</path-in-war>
+                </library>
+                <library dirs="200">
                     <file>${file.reference.Connect44FX.jnlp}</file>
                     <path-in-war>/</path-in-war>
                 </library>
@@ -59,6 +63,14 @@
                 </library>
                 <library dirs="200">
                     <file>${file.reference.JFXtras-0.5.jar}</file>
+                    <path-in-war>/lib</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${file.reference.JFXtras-0.5.jar.pack.gz}</file>
+                    <path-in-war>/lib</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${file.reference.swing-worker-1.2.jar.pack.gz}</file>
                     <path-in-war>/lib</path-in-war>
                 </library>
                 <library dirs="200">
