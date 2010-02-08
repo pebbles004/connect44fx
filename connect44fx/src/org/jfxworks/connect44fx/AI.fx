@@ -204,7 +204,8 @@ class AIPlayer extends Player {
                             if ( pretendThinkingTime.gt( 0s ) ) {
                                 def variation = pretendThinkingTimeVariation.toMillis();
                                 def sleep = pretendThinkingTime.toMillis() + RANDOM.nextInt( variation * 2 ) - variation;
-                                Thread.currentThread().sleep( Math.min(sleep,10000) );
+                                // TODO enable for final version
+                                // Thread.currentThread().sleep( Math.min(sleep,10000) );
                             }
                             // Run each tactic after each other. Once a tactic has chosen a
                             // column the search is interrupted.
