@@ -55,7 +55,6 @@
                 </library>
                 <library dirs="200">
                     <file>${file.reference.Connect44FX.jnlp}</file>
-                    <path-in-war>/</path-in-war>
                 </library>
                 <library dirs="200">
                     <file>${file.reference.Connect44FX_browser.jnlp}</file>
