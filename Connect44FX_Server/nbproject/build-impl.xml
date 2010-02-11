@@ -563,7 +563,6 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.jsr311-api-1.1.1.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.Connect44FX.jar}" todir="${build.web.dir}//"/>
         <copyfiles files="${file.reference.Connect44FX.jar.pack.gz}" todir="${build.web.dir}//"/>
-        <copyfiles files="${file.reference.Connect44FX.jnlp}" todir="${build.web.dir}//"/>
         <copyfiles files="${file.reference.Connect44FX_browser.jnlp}" todir="${build.web.dir}//"/>
         <copyfiles files="${file.reference.JFXtras-0.5.jar}" todir="${build.web.dir}//lib"/>
         <copyfiles files="${file.reference.JFXtras-0.5.jar.pack.gz}" todir="${build.web.dir}//lib"/>
@@ -583,7 +582,6 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.jsr311-api-1.1.1.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.Connect44FX.jar}" todir="${build.web.dir}//"/>
         <copyfiles files="${file.reference.Connect44FX.jar.pack.gz}" todir="${build.web.dir}//"/>
-        <copyfiles files="${file.reference.Connect44FX.jnlp}" todir="${build.web.dir}//"/>
         <copyfiles files="${file.reference.Connect44FX_browser.jnlp}" todir="${build.web.dir}//"/>
         <copyfiles files="${file.reference.JFXtras-0.5.jar}" todir="${build.web.dir}//lib"/>
         <copyfiles files="${file.reference.JFXtras-0.5.jar.pack.gz}" todir="${build.web.dir}//lib"/>
