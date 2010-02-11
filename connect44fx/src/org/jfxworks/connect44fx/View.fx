@@ -14,6 +14,7 @@ import javafx.scene.text.Text;
 import javafx.scene.Group;
 import javafx.scene.shape.Ellipse;
 import org.jfxworks.connect44fx.Model.*;
+import org.jfxworks.connect44fx.Behavior.Game;
 import javafx.animation.Interpolator;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
@@ -53,7 +54,7 @@ public function createMessageNode(width: Integer, height: Integer, message: Stri
 }
 
 public function createRoundStartMessageNode(width: Integer, height: Integer, game: Game, onClick: function(: MouseEvent): Void) {
-    var message = "Round {game.currentRound.round + 1}\nBoard is {game.grid.columns} by {game.grid.rows}\nAligned coins needed {game.currentRound.coinsNeededToWin}\nYour opponent {game.aiPlayer.name}\nStarting player: {game.currentPlayer.name}";
+    var message = "Round {game.roundId}\nBoard is {game.currentGrid.columns} by {game.currentGrid.rows}\nAligned coins needed {game.currentRound.coinsNeededToWin}\nYour opponent {game.currentAiPlayer.name}\nStarting player: {game.currentPlayer.name}";
     createMessageNode(width, height, message, onClick);
 }
 
@@ -137,41 +138,30 @@ class Board extends CustomNode {
 
     function rebuildContent(round: Integer, game:Game): Void {
         // cell sizing
-        var cellWidth = (width / game.grid.columns) as Integer;
-        var cellHeight = (height / game.grid.rows) as Integer;
+        var cellWidth = (width / game.currentGrid.columns) as Integer;
+        var cellHeight = (height / game.currentGrid.rows) as Integer;
 
         // coin nodes
         var coinHumanPlayer = createCoinNode(cellWidth, cellHeight, round, game.humanPlayer);
-        var coinAIPlayer = createCoinNode(cellWidth, cellHeight, round, game.aiPlayer);
+        var coinAIPlayer = createCoinNode(cellWidth, cellHeight, round, game.currentAiPlayer);
 
         // creating content
         container.content = Tile {
-            rows: game.grid.rows;
-            columns: game.grid.columns;
+            rows: game.currentGrid.rows;
+            columns: game.currentGrid.columns;
             hgap: 0
             vgap: 0
             tileHeight: cellHeight
             tileWidth: cellWidth
-            content: for (row in [0..<game.grid.rows], column in [0..<game.grid.columns]) {
-                def cell = game.grid.getCell(column, row);
+            content: for (row in [0..<game.currentGrid.rows], column in [0..<game.currentGrid.columns]) {
+                def cell = game.currentGrid.getCell(column, row);
                 def node = createCellNode(cellWidth, cellHeight, round, cell, coinHumanPlayer, coinAIPlayer);
 
                 node.onMouseClicked = function( event:MouseEvent ) :Void {
-                                        // only humans can click on the board to play WHILE the game is ongoing !!!
-                                        if ( currentPlayer.isHuman() and currentTurn > 0 and game.aiIsThinking == false ) {
-                                            if ( game.aiIsThinking ) {
-                                                println("AI : Hey ! I'm thinking you moron !");
+                                            if ( currentPlayer.isHuman() ) {
+                                                (currentPlayer as HumanPlayer).play( cell.column );
                                             }
-                                            else {
-                                                (currentPlayer as Model.HumanPlayer).play( cell.column );
-                                            }
-                                        }
                                       };
-
-                node.onMouseWheelMoved = function ( event:MouseEvent ) :Void {
-                    game.grid.test();
-                }
-
 
                 // return this node instance
                 node
