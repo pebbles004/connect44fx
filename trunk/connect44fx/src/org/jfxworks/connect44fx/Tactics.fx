@@ -2,6 +2,7 @@ package org.jfxworks.connect44fx;
 
 import java.util.Random;
 import org.jfxworks.connect44fx.Model.*;
+import org.jfxworks.connect44fx.Behavior.Game;
 
 def RANDOM = Random{};
 public def NO_CHOICE = -1;
@@ -42,7 +43,7 @@ public abstract class Tactics {
  */
 public class RandomChoice extends Tactics {
     override public function makeChoice (game : Game) : Integer {
-        def choices = game.grid.availableColumns();
+        def choices = game.currentGrid.availableColumns();
         return choices[ RANDOM.nextInt( sizeof choices ) ];
     }
 }
@@ -88,11 +89,11 @@ public class SearchForDirectWin extends Tactics {
 
         // match those patterns to the board
         for ( pattern in patterns ) {
-            for ( match in game.grid.findPattern( pattern ) ) {
+            for ( match in game.currentGrid.findPattern( pattern ) ) {
             // where's the hole ?
                 def hole = match.cells[ x | x.player == null ][0];
             // WINNER : if the hole is already at the bottom row OR a player has already played the cell underneath
-                if ( hole.row == (game.grid.rows-1) or game.grid.getCell( hole.column, hole.row+1 ).player != null ) {
+                if ( hole.row == (game.currentGrid.rows-1) or game.currentGrid.getCell( hole.column, hole.row+1 ).player != null ) {
                     return hole.column;
                 }
             }

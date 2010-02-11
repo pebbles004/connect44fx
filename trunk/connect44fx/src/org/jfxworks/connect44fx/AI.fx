@@ -12,6 +12,7 @@ package org.jfxworks.connect44fx;
 import java.util.Random;
 import org.jfxworks.connect44fx.Tactics.*;
 import org.jfxworks.connect44fx.Model.*;
+import org.jfxworks.connect44fx.Behavior.Game;
 import java.lang.Thread;
 import javafx.util.Math;
 import org.jfxtras.async.JFXWorker;
@@ -198,8 +199,6 @@ class AIPlayer extends Player {
 
         def worker = JFXWorker{
                          inBackground: function() {
-                            println("AI: Thinking .... ");
-                            game.aiIsThinking = true;
                             //pretend we're thinking really hard
                             if ( pretendThinkingTime.gt( 0s ) ) {
                                 def variation = pretendThinkingTimeVariation.toMillis();
@@ -220,7 +219,6 @@ class AIPlayer extends Player {
                             if ( choice == Tactics.NO_CHOICE ) {
                                 choice = randomTactic.run( game );
                             }
-                            println("AI: Thinking done !");
 
                             return choice;
                          }
