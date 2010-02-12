@@ -66,6 +66,51 @@ public class ScoreResource {
         return "NO SCORES FOUND FOR GAME '" + game + "'";
     }
 
+
+    @GET
+    @Produces("text/plain")
+    @Path("{game}/highest")
+    public String getGameHighestScore( @PathParam("game") String game ) {
+        LOGGER.info( "Request for highest score of " + game );
+        String player = "Nobody";
+        int maxScore  = 0;
+        EntityManager entityManager = null;
+        try {
+            entityManager = EMF.createEntityManager();
+            try {
+                // where's that game ?
+                Query query = entityManager.createQuery( "SELECT g FROM Game g WHERE g.name = :name" );
+                query.setParameter( "name", game );
+                Object object = query.getSingleResult();
+                // if no nre was thrown, the game is there
+                // TODO Query with MAX operator
+                for ( Score temp : ((Game)object).getScores() ) {
+                    if ( temp.getScore() >= maxScore ) {
+                        maxScore = temp.getScore();
+                        player = temp.getPlayerId();
+                    }
+                }
+            } catch ( NoResultException nre ) {
+                // this game has not been found yet - say nobody has a score just yet
+            }
+        } finally {
+            if ( entityManager != null ) {
+                entityManager.close();
+            }
+        }
+
+        // return an updated list of scores
+        return player + "," + maxScore;
+    }
+
+    @GET
+    @Produces("text/plain")
+    @Path("{game}/{player}/highest")
+    public String getPlayerHighestScore( @PathParam("game") String game, @PathParam("player") String player ) {
+        LOGGER.info( "Request for highest score of " + game + " for player " + player );
+        return "1000";
+    }
+
     /**
      * Service method to add a score to the high scores of a game.
      *
@@ -79,9 +124,9 @@ public class ScoreResource {
      */
     @GET
     @Produces("text/plain")
-    @Path("{game}/add")
+    @Path("{game}/add/")
     public String addScore( @PathParam("game") String game, @QueryParam("name") String namePlayer, @QueryParam("score") int score ) {
-
+        LOGGER.info( "Add score for game " + game + " of " + score + " for player " + namePlayer );
         EntityManager entityManager = null;
         try {
             entityManager = EMF.createEntityManager();
@@ -105,17 +150,18 @@ public class ScoreResource {
             }
             entityManager.flush();
             entityManager.getTransaction().commit();
+
+            return "true";
         } catch ( Exception e ) {
             if ( entityManager != null ) {
                 entityManager.getTransaction().rollback();
             }
+            
+            return "false";
         } finally {
             if ( entityManager != null ) {
                 entityManager.close();
             }
         }
-
-        // return an updated list of scores
-        return getAllScores( game );
     }
 }
