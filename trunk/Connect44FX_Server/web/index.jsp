@@ -15,6 +15,7 @@
     </head>
     <body>
         <h1>Connect44FX</h1>
+        <h3>Brought to you by the (not yet so) famous JFXWorks !</h3>
         <script src="http://dl.javafx.com/1.2/dtfx.js"></script>
         <script>
             javafx(
@@ -22,7 +23,7 @@
                 archive: "Connect44FX.jar",
                 draggable: true,
                 width: 400,
-                height: 342,
+                height: 450,
                 code: "org.jfxworks.connect44fx.Main",
                 name: "Connect44FX"
             }
