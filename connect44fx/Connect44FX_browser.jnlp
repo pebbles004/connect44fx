@@ -19,7 +19,7 @@
         <jar href="lib/JFXtras-0.5.jar"/>
         <jar href="lib/swing-worker-1.2.jar"/>
     </resources>
-    <applet-desc name="Connect44FX" main-class="com.sun.javafx.runtime.adapter.Applet" width="400" height="342">
+    <applet-desc name="Connect44FX" main-class="com.sun.javafx.runtime.adapter.Applet" width="400" height="450">
         <param name="MainJavaFXScript" value="org.jfxworks.connect44fx.Main"/>
     </applet-desc>
     <update check="background"/>
