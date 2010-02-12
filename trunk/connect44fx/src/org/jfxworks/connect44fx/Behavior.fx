@@ -197,7 +197,6 @@ abstract class State {
         // is the transition legal ?
         if ( sizeof allowedTransitions > 0 ) {
             if ( Sequences.indexOf(allowedTransitions, nextState) == -1 ) {
-                println("Can not transit from {this} to {nextState}.");
                 throw new IllegalStateException("Can not transit from {this} to {nextState}.");
             }
         }

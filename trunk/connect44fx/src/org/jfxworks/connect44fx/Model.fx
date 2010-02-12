@@ -217,7 +217,7 @@ public abstract class Player {
     /**
      * Name of the player
      */
-    public var name;
+    public var name = "";
 
    /**
     * A one-character label indicating what type of player this is.
