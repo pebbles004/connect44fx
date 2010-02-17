@@ -11,10 +11,10 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <title>Connect44FX</title>
+        <title>Connect44FX Alpha 1</title>
     </head>
     <body>
-        <h1>Connect44FX</h1>
+        <h1>Connect44FX Alpha 1</h1>
         <h3>Brought to you by the (not yet so) famous JFXWorks !</h3>
         <script src="http://dl.javafx.com/1.2/dtfx.js"></script>
         <script>
