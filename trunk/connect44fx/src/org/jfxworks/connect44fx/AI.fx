@@ -13,8 +13,6 @@ import java.util.Random;
 import org.jfxworks.connect44fx.Tactics.*;
 import org.jfxworks.connect44fx.Model.*;
 import org.jfxworks.connect44fx.Behavior.Game;
-import java.lang.Thread;
-import javafx.util.Math;
 import org.jfxtras.async.JFXWorker;
 
 def RANDOM:Random = Random{};
@@ -44,111 +42,36 @@ public function createAIPlayer( round:Round ) :Player {
 function initializeAIPlayers() :Void {
 
 // AI making random choices
-
-    // level 0
-    insert AIPlayer {} into AI_PLAYERS;
-
-    // level 1
     insert AIPlayer {
-        pretendThinkingTimeVariation: 500ms
     } into AI_PLAYERS;
-
-    // level 2
     insert AIPlayer {
-        pretendThinkingTime: 2s
-        pretendThinkingTimeVariation: 500ms
-    } into AI_PLAYERS;
-
-    // level 3
-    insert AIPlayer {
-        pretendThinkingTime: 1s
-        pretendThinkingTimeVariation: 200ms
-    } into AI_PLAYERS;
-
-    // level 4
-    insert AIPlayer {
-        pretendThinkingTime: 500ms
-        pretendThinkingTimeVariation: 100ms
         tactics: SearchForDirectWin {
             applicationProbability: .5
         }
     } into AI_PLAYERS;
 
-// AI are trying to score a direct hit
-
-    // level 5
-    insert AIPlayer {
-        pretendThinkingTime: 0s
-        pretendThinkingTimeVariation: 100ms
-        tactics: SearchForDirectWin {
-            applicationProbability: .7
-        }
-    } into AI_PLAYERS;
-
-    // level 6
-    insert AIPlayer {
-        pretendThinkingTime: 0s
-        pretendThinkingTimeVariation: 100ms
-        tactics: SearchForDirectWin {
-            applicationProbability: 1.0
-        }
-    } into AI_PLAYERS;
-
-    // level 7
-    insert AIPlayer {
-        pretendThinkingTime: 0s
-        pretendThinkingTimeVariation: 0s
-        tactics: SearchForDirectWin {
-            applicationProbability: 1.0
-        }
-    } into AI_PLAYERS;
-
 // AI are actively blocking direct wins of the opponent
-
-    // level 8
     insert AIPlayer {
-        pretendThinkingTime: 0s
-        pretendThinkingTimeVariation: 0s
-        tactics: [ Tactics.SearchForOpponentDirectWin{ applicationProbability: .5 }, SearchForDirectWin { applicationProbability: 1.0 } ]
-    } into AI_PLAYERS;
-
-    // level 9
-    insert AIPlayer {
-        pretendThinkingTime: 0s
-        pretendThinkingTimeVariation: 0s
         tactics: [ Tactics.SearchForOpponentDirectWin{ applicationProbability: .7 }, SearchForDirectWin { applicationProbability: 1.0 } ]
     } into AI_PLAYERS;
-
-    // level 10
     insert AIPlayer {
-        pretendThinkingTime: 0s
-        pretendThinkingTimeVariation: 0s
         tactics: [ Tactics.SearchForOpponentDirectWin{ applicationProbability: 1 }, SearchForDirectWin { applicationProbability: 1.0 } ]
     } into AI_PLAYERS;
 
-// AI players are looking for a hole of two cells in order to prepare for a direct hit
-
-    // level 11
+// AI are trying to score a direct hit
     insert AIPlayer {
-        pretendThinkingTime: 0s
-        pretendThinkingTimeVariation: 0s
-        tactics: [ SearchForOpponentDirectWin {
-                        applicationProbability: 1
-                   }
-                   SearchForDirectWin {
-                        applicationProbability: 1
-                   }
-                   SearchForIndirectWin {
-                        applicationProbability: .3
-                        movesToMake: 2
-                   }
-                 ]
+        tactics: SearchForDirectWin {
+            applicationProbability: 1.0
+        }
+    } into AI_PLAYERS;
+    insert AIPlayer {
+        tactics: SearchForDirectWin {
+            applicationProbability: 1.0
+        }
     } into AI_PLAYERS;
 
-    // level 12
+// AI players are looking for a hole of two cells in order to prepare for a direct hit
     insert AIPlayer {
-        pretendThinkingTime: 0s
-        pretendThinkingTimeVariation: 0s
         tactics: [ SearchForOpponentDirectWin {
                         applicationProbability: 1
                    }
@@ -161,11 +84,7 @@ function initializeAIPlayers() :Void {
                    }
                  ]
     } into AI_PLAYERS;
-
-    // level 13
     insert AIPlayer {
-        pretendThinkingTime: 0s
-        pretendThinkingTimeVariation: 0s
         tactics: [ SearchForOpponentDirectWin {
                         applicationProbability: 1
                    }
@@ -185,27 +104,15 @@ function initializeAIPlayers() :Void {
  * who's chosing a random column to put his coin into.
  */
 class AIPlayer extends Player {
-
-    public-init var pretendThinkingTime = 5s;
-
-    public-init var pretendThinkingTimeVariation = 1s;
-
     public-init var tactics:Tactics[];
 
-    def randomTactic = RandomChoice{};
+    def fallbackTactic = RandomChoice{};
 
     override public function thinkAboutNextMove( game:Game, onChose:function( :Integer ) :Void ) :Void  {
         def choiceCallback = onChose;
 
         def worker = JFXWorker{
                          inBackground: function() {
-                            //pretend we're thinking really hard
-                            if ( pretendThinkingTime.gt( 0s ) ) {
-                                def variation = pretendThinkingTimeVariation.toMillis();
-                                def sleep = pretendThinkingTime.toMillis() + RANDOM.nextInt( variation * 2 ) - variation;
-                                // TODO enable for final version
-                                // Thread.currentThread().sleep( Math.min(sleep,10000) );
-                            }
                             // Run each tactic after each other. Once a tactic has chosen a
                             // column the search is interrupted.
                             var choice = Tactics.NO_CHOICE;
@@ -217,7 +124,7 @@ class AIPlayer extends Player {
 
                             // Fallback to the elementary tactic as all other tactics have failed.
                             if ( choice == Tactics.NO_CHOICE ) {
-                                choice = randomTactic.run( game );
+                                choice = fallbackTactic.run( game );
                             }
 
                             return choice;
