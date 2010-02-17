@@ -255,7 +255,7 @@ class GameStarted extends State {
  */
 class GameEnded extends State {
     override function enter () : Void {
-        println("ENTER --> {this}");
+        //println("ENTER --> {this}");
         game.dispatch( game.EVENT_TYPE_GAME_END, game );
     }
 }
@@ -272,7 +272,7 @@ class RoundStarted extends State {
     * - Generate a new grid based on the round
     */
     override function enter () : Void {
-        println("\nENTER --> {this}");
+        //println("\nENTER --> {this}");
         // any pre-configured rounds left on the stack ?
         var round:Round;
 
@@ -353,7 +353,7 @@ class RoundStarted extends State {
  */
 class RoundEnded extends State {
     override function enter() :Void {
-        println("ENTER --> {this}");
+        //println("ENTER --> {this}");
         if ( game.winningPlayer != null ) {
             game.dispatch( game.EVENT_TYPE_WIN, game.currentPlayer, game );
             if ( game.winningPlayer.isAI() ) {
@@ -377,7 +377,7 @@ class RoundEnded extends State {
 abstract class TurnStarted extends State {
 
     override function enter () : Void {
-        println("ENTER --> {this}");
+        //println("ENTER --> {this}");
         // select the next player - in the very first turn the initial player is already known
         if ( game.turnId > 0 ) {
             if ( game.currentPlayer.isAI() ) {
@@ -405,7 +405,7 @@ abstract class TurnStarted extends State {
         }
         // ignore this case - because it means the user is clicking around
         if ( currentPlayer.isHuman() and game.currentState != game.humanTurnState ) {
-            println("Human player is not allowed to play now");
+            //println("Human player is not allowed to play now");
             return;
         }
 
@@ -445,7 +445,7 @@ class HumanTurnStarted extends TurnStarted {
 
 
     override function leave () : Void {
-        println("LEAVE --> {this}");
+        //println("LEAVE --> {this}");
         game.humanScore += 200 - (( stopChrono - startChrono )/1000);
     }
 }
@@ -455,7 +455,7 @@ class HumanTurnStarted extends TurnStarted {
  */
 class TurnEnded extends State {
     override function enter () : Void {
-        println("ENTER --> {this}");
+        //println("ENTER --> {this}");
         game.dispatch( game.EVENT_TYPE_TURN_END, game.turnId, game.currentPlayer, game );
 
         if ( game.winningSequenceFound() ) {

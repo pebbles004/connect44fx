@@ -179,6 +179,12 @@ class Board extends CustomNode {
             vgap: 0
             tileHeight: cellHeight
             tileWidth: cellWidth
+            clip: Rectangle {
+                height: game.currentGrid.rows * cellHeight
+                width:  game.currentGrid.columns * cellWidth
+                arcHeight: 25
+                arcWidth: 25
+            }
             content: for (row in [0..<game.currentGrid.rows], column in [0..<game.currentGrid.columns]) {
                 def cell = game.currentGrid.getCell(column, row);
                 def node = createCellNode(cellWidth, cellHeight, round, cell, coinHumanPlayer, coinAIPlayer);
