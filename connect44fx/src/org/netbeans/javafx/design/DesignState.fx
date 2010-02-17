@@ -29,6 +29,7 @@
  
 package org.netbeans.javafx.design;
 
+import javafx.animation.Timeline;
 import org.netbeans.javafx.design.DesignStateChangeType;
 
 /**
@@ -55,7 +56,15 @@ public class DesignState {
      * A timeline sets various properties of components in a design to specific value.
      * At the end of the timeline, the design should look as designed for a specific state.
      */
-    public-init var timelines: javafx.animation.Timeline[];
+    public-init var timelines: Timeline[];
+
+    /**
+     * This function should create a timeline for a specified actual state.
+     * Default implementation returns a timeline stored <code>timelines</code> sequence at <code>actual</code> position.
+     */
+    public-init var createTimeline: function (actual: Integer): Timeline = function (actual) {
+        timelines[actual]
+    };
 
     /**
      * Defines how the timelines should be stop/started when the actual state is changed.
@@ -76,8 +85,10 @@ public class DesignState {
      */
     public var onActualStateChanged: function (oldState: Integer,newState: Integer): Void;
 
+    var actualTimeline: Timeline;
+
     /**
-     * Holds the actual state index. The defined indices are [0 .. < sizeof timelines].
+     * Holds the actual state index. The defined indices are [0 .. < sizeof names].
      * Any other index is taken as undefined.
      * Default actual state index is <code>-1</code>.
      * When a new actual state index is set, then based on <code>onActualStateChanged</code>
@@ -85,13 +96,15 @@ public class DesignState {
      */
     public var actual = -1 on replace old {
         if (stateChangeType == DesignStateChangeType.PAUSE_AND_PLAY_FROM_START) {
-            timelines[old].stop ();
-            timelines[actual].playFromStart ();
+            actualTimeline.stop ();
+            actualTimeline = createTimeline (actual);
+            actualTimeline.playFromStart ();
         } else if (stateChangeType == DesignStateChangeType.FINISH_AND_PLAY_FROM_START) {
-            timelines[old].time = timelines[old].totalDuration;
-            timelines[actual].playFromStart ();
+            actualTimeline.time = actualTimeline.totalDuration;
+            actualTimeline = createTimeline (actual);
+            actualTimeline.playFromStart ();
         } else if (stateChangeType == DesignStateChangeType.CONTINUE_AND_PLAY) {
-            timelines[actual].play ();
+            actualTimeline.play ();
         } else if (stateChangeType == DesignStateChangeType.DO_NOTHING) {
         }
 
@@ -126,7 +139,7 @@ public class DesignState {
      * when the new actual state index would be undefined index.
      */
     public function next () {
-        if (actual < sizeof timelines - 1) {
+        if (actual < sizeof names - 1) {
             actual = actual + 1;
         }
     }
@@ -137,7 +150,7 @@ public class DesignState {
      * If the new actual state index would be undefined index, the last defined index is set instead.
      */
     public function previousWrapped () {
-        actual = if (actual > 0) then actual - 1 else sizeof timelines - 1
+        actual = if (actual > 0) then actual - 1 else sizeof names - 1
     }
 
     /**
@@ -146,7 +159,7 @@ public class DesignState {
      * If the new actual state index would be undefined index, the first defined index is set instead.
      */
     public function nextWrapped () {
-        actual = if (actual < sizeof timelines - 1) then actual + 1 else 0
+        actual = if (actual < sizeof names - 1) then actual + 1 else 0
     }
 
 }
