@@ -15,6 +15,7 @@ import javafx.scene.layout.Stack;
 import javafx.scene.image.*;
 import org.jfxworks.connect44fx.GameService;
 import java.lang.System;
+import org.jfxworks.connect44fx.ResourceLocator;
 
 def WIDTH  = 400;
 def HEIGHT = 342;
@@ -24,11 +25,11 @@ var stage:Stage;
 def game:Game = Game {
     humanPlayer: HumanPlayer {
         name: System.getProperty("user.name");
-        imageUrl: "{__DIR__}resources/human.png"
+        imageUrl: ResourceLocator.locate( "human.png" )
     }
 };
 
-def startMessage = View.createMessageNode( WIDTH, HEIGHT, "Click to start the game", initGame );
+def startMessage = View.createMessageNode( 200, 100, "Click to start the game", initGame );
 def boardNode    = View.createBoardNode(WIDTH, HEIGHT, game);
 def gameNode:Stack = Stack {
     width: WIDTH
@@ -44,8 +45,10 @@ def score = bind game.humanScore on replace {
 }
 
 // Keep the round/turn id in sync
-def round = bind game.roundId on replace {
-    screenNode.turnLabel.text = "Round {round}, {game.currentRound.coinsNeededToWin} coins required";
+def round = bind game.currentRound on replace {
+    if ( round != null ) {
+        screenNode.turnLabel.text = "Round {round.round+1}, {round.coinsNeededToWin} coins required";
+    }
 }
 
 // Keep the names of the players in sync
@@ -63,6 +66,9 @@ def aiPlayer = bind game.currentAiPlayer on replace {
 
 
 public function run() :Void {
+    // get the high score
+    GameService.requestHighestScore( setHighScore );
+
     // do some syncing with fixed values
     screenNode.humanName.text = game.humanPlayer.name;
     screenNode.humanImageView.image = Image {
@@ -71,7 +77,12 @@ public function run() :Void {
         height: 70
         preserveRatio: true
     }
-    GameService.requestHighestScore( setHighScore );
+    screenNode.aiImageView.image = Image {
+        url: ResourceLocator.locate( "ai.png" )
+        width: 70
+        height: 70
+        preserveRatio: true
+    }
 
     // set the event listeners
     game.addEventListener( game.EVENT_TYPE_WIN, playerWins );

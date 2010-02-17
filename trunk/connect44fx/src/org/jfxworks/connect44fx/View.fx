@@ -10,14 +10,12 @@ import javafx.scene.layout.Stack;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.scene.Group;
 import javafx.scene.shape.Ellipse;
 import org.jfxworks.connect44fx.Model.*;
 import org.jfxworks.connect44fx.Behavior.Game;
 import javafx.animation.Interpolator;
 import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
 import javafx.fxd.Duplicator;
 import javafx.scene.CustomNode;
 import javafx.scene.layout.Panel;
@@ -26,30 +24,58 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.shape.ShapeSubtract;
 import org.jfxworks.connect44fx.templates.Level1Cell;
 import javafx.scene.layout.VBox;
+import org.jfxworks.connect44fx.screen.MessagePopup;
+import org.jfxworks.connect44fx.screen.IconMessagePopup;
+import javafx.scene.image.*;
+import org.jfxworks.connect44fx.ResourceLocator;
+import org.jfxworks.connect44fx.resources.Ok;
 
 
 // EXPERIMENTAL : Set this to false to for generated classes of InkScape.
 def USE_DEFAULT_SKINS = true;
 
-/**
- * @author jan
- */
+public function createIconPopupMEssageNode( width:Integer, height:Integer, message:String, onClick: function(: MouseEvent): Void): Node {
+    def popup = IconMessagePopup{};
+    // set the message
+    popup.message.content = message;
+//    popup.icon.content = ImageView {
+//        image: Image {
+//            url: ResourceLocator.locate("ok.png")
+//            width: 80
+//            height: 80
+//            preserveRatio: true
+//        }
+//    }
+
+    popup.icon.content = Ok{};
+
+    // scale to the demanded size
+    def node = popup.getDesignRootNodes()[0];
+    node.scaleX = 1.0 * width/node.boundsInLocal.width;
+    node.scaleY = 1.0 * height/node.boundsInLocal.height;
+    
+    return node;
+
+}
+
 public function createMessageNode(width: Integer, height: Integer, message: String, onClick: function(: MouseEvent): Void): Node {
+    // configure the message
+    def popup = MessagePopup {}
+    popup.message.content = message;
+    popup.rectangle.width = width;
+    popup.rectangle.height = height;
+
+    // transfer the nodes of the message to another container
+    var nodes = popup.getDesignRootNodes();
+    // this is needed to avoid the warning about a node being at two places in the scene graph
+    delete (popup.getDesignScene().content[0] as Panel).content; // <== Beats me why this is needed. Simply erasing the scene content is not enough
+    delete popup.getDesignScene().content;
+
+    // pack & send
     Stack {
         blocksMouse: true // otherwise the mouse event propagates to the board !
-        width: width
-        height: height
-        content: [
-            Rectangle {
-                width: width
-                height: height
-                fill: Color.LAVENDERBLUSH
-                onMouseClicked: onClick
-            }
-            Text {
-                content: message
-            }
-        ]
+        onMouseClicked: onClick;
+        content: nodes
     }
 }
 

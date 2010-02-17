@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Model modelID="fxc" modelVersion="40" rootInstance="DesignModel1" version="1">
+    <Instance classID="DesignModel" instanceID="DesignModel1">
+        <List name="stateVariables">
+            <Item value="inst:StateVariableModel1"/>
+        </List>
+        <List name="resources">
+            <Item value="inst:LinearGradientModel1"/>
+            <Item value="inst:DropShadowEffectModel1"/>
+        </List>
+        <List name="dataSources"/>
+        <List name="effects"/>
+        <Reference name="scene" value="inst:SceneModel1"/>
+        <Reference name="designWidth" value="flt:-1.0"/>
+        <Reference name="designHeight" value="flt:-1.0"/>
+        <Reference name="designProfile" value="profile:DESKTOP"/>
+        <Reference name="synchronizeDeviceAndSceneSizes" value="bool:true"/>
+    </Instance>
+    <Instance classID="StateVariableModel" instanceID="StateVariableModel1">
+        <Reference name="instanceName" value="str:currentState"/>
+        <List name="states"/>
+        <Reference name="startState" value="null"/>
+        <Reference name="stateChangeType" value="statechange:PAUSE_AND_PLAY_FROM_START"/>
+        <Reference name="defaultInterpolator" value="interpolator:DISCRETE"/>
+        <Reference name="defaultDuration" value="int:0"/>
+    </Instance>
+    <Instance classID="LinearGradientModel" instanceID="LinearGradientModel1">
+        <Reference name="instanceName" value="str:linearGradient"/>
+        <Reference name="preCreationCode" value="null"/>
+        <Reference name="postCreationCode" value="null"/>
+        <Reference name="stops" value="prop:70,anim:,,sequence:24,gradientstop:0.0,#FFFFFF24,gradientstop:1.0,#DDDDDD,"/>
+    </Instance>
+    <Instance classID="DropShadowEffectModel" instanceID="DropShadowEffectModel1">
+        <Reference name="instanceName" value="str:dropShadowEffect"/>
+        <Reference name="preCreationCode" value="null"/>
+        <Reference name="postCreationCode" value="null"/>
+    </Instance>
+    <Instance classID="SceneModel" instanceID="SceneModel1">
+        <Reference name="instanceName" value="str:scene"/>
+        <List name="nodes">
+            <Item value="inst:PanelModel1"/>
+        </List>
+        <Reference name="generateSceneInstance" value="bool:true"/>
+        <Reference name="generateScenePanel" value="bool:true"/>
+        <Reference name="preCreationCode" value="null"/>
+        <Reference name="postCreationCode" value="null"/>
+        <Reference name="preInitCode" value="null"/>
+        <Reference name="postInitCode" value="null"/>
+    </Instance>
+    <Instance classID="PanelModel" instanceID="PanelModel1">
+        <Reference name="instanceName" value="str:panel"/>
+        <Reference name="layoutInfoWidth" value="prop:16,anim:,,flt:250.0,4,null,"/>
+        <Reference name="layoutInfoHeight" value="prop:16,anim:,,flt:100.0,4,null,"/>
+        <Reference name="preCreationCode" value="null"/>
+        <Reference name="postCreationCode" value="null"/>
+        <List name="content">
+            <Item value="inst:RectangleShapeModel1"/>
+            <Item value="inst:StackModel1"/>
+            <Item value="inst:TextShapeModel1"/>
+        </List>
+    </Instance>
+    <Instance classID="RectangleShapeModel" instanceID="RectangleShapeModel1">
+        <Reference name="instanceName" value="str:rectangle"/>
+        <Reference name="effect" value="prop:34,anim:,,inst:DropShadowEffectModel1,4,null,"/>
+        <Reference name="preCreationCode" value="null"/>
+        <Reference name="postCreationCode" value="null"/>
+        <Reference name="fill" value="prop:32,anim:,,inst:LinearGradientModel1,4,null,"/>
+        <Reference name="width" value="prop:16,anim:,,flt:250.0,4,null,"/>
+        <Reference name="height" value="prop:16,anim:,,flt:100.0,4,null,"/>
+    </Instance>
+    <Instance classID="StackModel" instanceID="StackModel1">
+        <Reference name="instanceName" value="str:icon"/>
+        <Reference name="layoutX" value="prop:15,anim:,,flt:12.0,4,null,"/>
+        <Reference name="layoutY" value="prop:15,anim:,,flt:14.0,4,null,"/>
+        <Reference name="layoutInfoWidth" value="prop:15,anim:,,flt:63.0,4,null,"/>
+        <Reference name="layoutInfoHeight" value="prop:15,anim:,,flt:60.0,4,null,"/>
+        <Reference name="layoutInfoMaxWidth" value="prop:15,anim:,,flt:70.0,4,null,"/>
+        <Reference name="layoutInfoMaxHeight" value="prop:15,anim:,,flt:70.0,4,null,"/>
+        <Reference name="preCreationCode" value="null"/>
+        <Reference name="postCreationCode" value="null"/>
+        <List name="content"/>
+    </Instance>
+    <Instance classID="TextShapeModel" instanceID="TextShapeModel1">
+        <Reference name="instanceName" value="str:message"/>
+        <Reference name="layoutX" value="prop:15,anim:,,flt:84.0,4,null,"/>
+        <Reference name="layoutY" value="prop:15,anim:,,flt:33.0,4,null,"/>
+        <Reference name="preCreationCode" value="null"/>
+        <Reference name="postCreationCode" value="null"/>
+        <Reference name="content" value="prop:15,anim:,,str:Text,4,null,"/>
+    </Instance>
+</Model>

@@ -17,6 +17,7 @@ import javafx.util.Properties;
 import javafx.util.Math;
 import java.util.Random;
 import java.lang.System;
+import org.jfxworks.connect44fx.ResourceLocator;
 
 // we're using a fixed seed to make sure the generator
 // creates the same numbers for every player
@@ -220,8 +221,6 @@ class GameStarted extends State {
      * Read the rounds.properties file to allow pre-configured round configuration.
      */
     override function enter () : Void {
-        println("ENTER --> {this}");
-
         // initialize the rounds sequence with pre-configured settings.
         // when these are exhausted the game will add ad-infinitum rounds to it
         // with ever increasing difficulty
@@ -233,12 +232,12 @@ class GameStarted extends State {
         while( properties.get("round.{round}") != null ) {
             def values = properties.get("round.{round}").split(",");
             insert Round {
-                round: round;
-                aiPlayerName: values[0];
-                imageUrl: "{__DIR__}resources/{values[1]}";
-                rows: Integer.parseInt(values[2]);
-                columns: Integer.parseInt(values[3]);
-                coinsNeededToWin: Integer.parseInt(values[4]);
+                round: round
+                aiPlayerName: values[0]
+                imageUrl: ResourceLocator.locate("{values[1]}")
+                rows: Integer.parseInt(values[2])
+                columns: Integer.parseInt(values[3])
+                coinsNeededToWin: Integer.parseInt(values[4])
             } into game.rounds;
             round++;
         }

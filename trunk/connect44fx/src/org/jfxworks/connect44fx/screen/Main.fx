@@ -31,42 +31,14 @@ public class Main {
     public-read var big: javafx.scene.text.Font;
     public-read var moderate: javafx.scene.text.Font;
     public-read var default: javafx.scene.text.Font;
+    public-read var linearGradient: javafx.scene.paint.LinearGradient;
+    public-read var linearGradient2: javafx.scene.paint.LinearGradient;
+    public-read var dropShadowEffect: javafx.scene.effect.DropShadow;
     
     public-read var currentState: org.netbeans.javafx.design.DesignState;
     
     // <editor-fold defaultstate="collapsed" desc="Generated Init Block">
     init {
-        humanImageView = javafx.scene.image.ImageView {
-        };
-        stack = javafx.scene.layout.Stack {
-            width: 94.0
-            height: 75.0
-            layoutInfo: javafx.scene.layout.LayoutInfo {
-                width: bind stack.width
-                height: bind stack.height
-            }
-            content: [ humanImageView, ]
-        };
-        highestScoreLabel = javafx.scene.control.Label {
-            width: 212.0
-            layoutInfo: javafx.scene.layout.LayoutInfo {
-                width: bind highestScoreLabel.width
-                height: bind highestScoreLabel.height
-            }
-            text: "Highest (checking...)"
-            hpos: javafx.geometry.HPos.CENTER
-        };
-        aiImageView = javafx.scene.image.ImageView {
-        };
-        stack2 = javafx.scene.layout.Stack {
-            width: 94.0
-            height: 75.0
-            layoutInfo: javafx.scene.layout.LayoutInfo {
-                width: bind stack2.width
-                height: bind stack2.height
-            }
-            content: [ aiImageView, ]
-        };
         gamePanel = javafx.scene.layout.Stack {
             width: 400.0
             height: 342.0
@@ -81,59 +53,16 @@ public class Main {
             content: [ ]
         };
         big = javafx.scene.text.Font {
-            embolden: true
             size: 25.0
-        };
-        scoreLabel = javafx.scene.control.Label {
-            width: 212.0
-            height: 30.0
-            layoutInfo: javafx.scene.layout.LayoutInfo {
-                width: bind scoreLabel.width
-                height: bind scoreLabel.height
-            }
-            text: "Score"
-            font: big
-            hpos: javafx.geometry.HPos.CENTER
-            vpos: javafx.geometry.VPos.CENTER
+            embolden: true
         };
         moderate = javafx.scene.text.Font {
-            oblique: true
             size: 15.0
-        };
-        turnLabel = javafx.scene.control.Label {
-            width: 212.0
-            layoutInfo: javafx.scene.layout.LayoutInfo {
-                width: bind turnLabel.width
-                height: bind turnLabel.height
-            }
-            text: ""
-            font: moderate
-            hpos: javafx.geometry.HPos.CENTER
-            vpos: javafx.geometry.VPos.CENTER
-        };
-        vbox3 = javafx.scene.layout.VBox {
-            width: 212.0
-            height: 0.0
-            layoutInfo: javafx.scene.layout.LayoutInfo {
-                width: bind vbox3.width
-                height: bind vbox3.height
-            }
-            content: [ scoreLabel, highestScoreLabel, turnLabel, ]
-            spacing: 4.0
-        };
-        hbox = javafx.scene.layout.HBox {
-            width: 400.0
-            height: 75.0
-            layoutInfo: javafx.scene.layout.LayoutInfo {
-                width: bind hbox.width
-                height: bind hbox.height
-            }
-            content: [ stack, vbox3, stack2, ]
-            spacing: 0.0
+            oblique: true
         };
         default = javafx.scene.text.Font {
-            embolden: true
             oblique: true
+            embolden: true
         };
         aiName = javafx.scene.control.Label {
             width: 180.0
@@ -143,7 +72,7 @@ public class Main {
                 height: bind aiName.height
                 vpos: javafx.geometry.VPos.TOP
             }
-            text: "AI Player"
+            text: "Computer"
             font: default
             hpos: javafx.geometry.HPos.RIGHT
         };
@@ -160,6 +89,18 @@ public class Main {
             font: default
             hpos: javafx.geometry.HPos.LEFT
         };
+        linearGradient = javafx.scene.paint.LinearGradient {
+            stops: [ javafx.scene.paint.Stop { offset: 0.0, color: javafx.scene.paint.Color.web ("#FFFFFF") }, javafx.scene.paint.Stop { offset: 1.0, color: javafx.scene.paint.Color.web ("#000000") }, ]
+        };
+        linearGradient2 = javafx.scene.paint.LinearGradient {
+            cycleMethod: javafx.scene.paint.CycleMethod.NO_CYCLE
+            proportional: true
+            stops: [ javafx.scene.paint.Stop { offset: 0.0, color: javafx.scene.paint.Color.web ("#FFFFFF") }, javafx.scene.paint.Stop { offset: 1.0, color: javafx.scene.paint.Color.web ("#CCCCCC") }, ]
+        };
+        dropShadowEffect = javafx.scene.effect.DropShadow {
+            offsetX: 3.0
+            offsetY: 3.0
+        };
         tile = javafx.scene.layout.Tile {
             width: 400.0
             height: 20.0
@@ -167,12 +108,92 @@ public class Main {
                 width: bind tile.width
                 height: bind tile.height
             }
+            effect: dropShadowEffect
             content: [ humanName, aiName, ]
             columns: 2
             rows: 1
+            hpos: javafx.geometry.HPos.CENTER
             hgap: 6.0
             vgap: 0.0
+        };
+        aiImageView = javafx.scene.image.ImageView {
+            effect: dropShadowEffect
+        };
+        stack2 = javafx.scene.layout.Stack {
+            width: 94.0
+            height: 75.0
+            layoutInfo: javafx.scene.layout.LayoutInfo {
+                width: bind stack2.width
+                height: bind stack2.height
+            }
+            content: [ aiImageView, ]
+        };
+        turnLabel = javafx.scene.control.Label {
+            width: 212.0
+            layoutInfo: javafx.scene.layout.LayoutInfo {
+                width: bind turnLabel.width
+                height: bind turnLabel.height
+            }
+            effect: dropShadowEffect
+            text: ""
+            font: moderate
             hpos: javafx.geometry.HPos.CENTER
+            vpos: javafx.geometry.VPos.CENTER
+        };
+        highestScoreLabel = javafx.scene.control.Label {
+            width: 212.0
+            layoutInfo: javafx.scene.layout.LayoutInfo {
+                width: bind highestScoreLabel.width
+                height: bind highestScoreLabel.height
+            }
+            effect: dropShadowEffect
+            text: "Highest (checking...)"
+            hpos: javafx.geometry.HPos.CENTER
+        };
+        scoreLabel = javafx.scene.control.Label {
+            width: 212.0
+            height: 30.0
+            layoutInfo: javafx.scene.layout.LayoutInfo {
+                width: bind scoreLabel.width
+                height: bind scoreLabel.height
+            }
+            effect: dropShadowEffect
+            text: "Score"
+            font: big
+            hpos: javafx.geometry.HPos.CENTER
+            vpos: javafx.geometry.VPos.CENTER
+        };
+        vbox3 = javafx.scene.layout.VBox {
+            width: 212.0
+            height: 0.0
+            layoutInfo: javafx.scene.layout.LayoutInfo {
+                width: bind vbox3.width
+                height: bind vbox3.height
+            }
+            content: [ scoreLabel, highestScoreLabel, turnLabel, ]
+            spacing: 4.0
+        };
+        humanImageView = javafx.scene.image.ImageView {
+            effect: dropShadowEffect
+        };
+        stack = javafx.scene.layout.Stack {
+            width: 94.0
+            height: 75.0
+            layoutInfo: javafx.scene.layout.LayoutInfo {
+                width: bind stack.width
+                height: bind stack.height
+            }
+            content: [ humanImageView, ]
+        };
+        hbox = javafx.scene.layout.HBox {
+            width: 400.0
+            height: 75.0
+            layoutInfo: javafx.scene.layout.LayoutInfo {
+                width: bind hbox.width
+                height: bind hbox.height
+            }
+            content: [ stack, vbox3, stack2, ]
+            spacing: 0.0
         };
         vbox5 = javafx.scene.layout.VBox {
             layoutInfo: javafx.scene.layout.LayoutInfo {
@@ -220,14 +241,15 @@ public class Main {
                 content: getDesignRootNodes ()
             }
             cursor: javafx.scene.Cursor.DEFAULT
-            fill: javafx.scene.paint.Color.color(0.7529412,0.7529412,0.7529412,1.0)
+            fill: linearGradient2
         };
         
         currentState = org.netbeans.javafx.design.DesignState {
             names: [ ]
             stateChangeType: org.netbeans.javafx.design.DesignStateChangeType.PAUSE_AND_PLAY_FROM_START
-            timelines: [
-            ]
+            createTimeline: function (actual) {
+                null
+            }
         }
     }// </editor-fold>
     
@@ -239,5 +261,4 @@ public class Main {
     public function getDesignScene (): javafx.scene.Scene {
         scene
     }// </editor-fold>//GEN-END:main
-
 }

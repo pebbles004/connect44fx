@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Model modelID="fxc" modelVersion="25" rootInstance="DesignModel1" version="1">
+<Model modelID="fxc" modelVersion="40" rootInstance="DesignModel1" version="1">
     <Instance classID="DesignModel" instanceID="DesignModel1">
         <List name="stateVariables">
             <Item value="inst:StateVariableModel1"/>
@@ -8,6 +8,9 @@
             <Item value="inst:FontModel1"/>
             <Item value="inst:FontModel2"/>
             <Item value="inst:FontModel3"/>
+            <Item value="inst:LinearGradientModel1"/>
+            <Item value="inst:LinearGradientModel2"/>
+            <Item value="inst:DropShadowEffectModel1"/>
         </List>
         <List name="dataSources"/>
         <List name="effects"/>
@@ -22,6 +25,8 @@
         <List name="states"/>
         <Reference name="startState" value="null"/>
         <Reference name="stateChangeType" value="statechange:PAUSE_AND_PLAY_FROM_START"/>
+        <Reference name="defaultInterpolator" value="interpolator:DISCRETE"/>
+        <Reference name="defaultDuration" value="int:0"/>
     </Instance>
     <Instance classID="FontModel" instanceID="FontModel1">
         <Reference name="instanceName" value="str:big"/>
@@ -44,6 +49,27 @@
         <Reference name="embolden" value="prop:25,anim:0,DISCRETE,bool:true,"/>
         <Reference name="oblique" value="prop:25,anim:0,DISCRETE,bool:true,"/>
     </Instance>
+    <Instance classID="LinearGradientModel" instanceID="LinearGradientModel1">
+        <Reference name="instanceName" value="str:linearGradient"/>
+        <Reference name="preCreationCode" value="null"/>
+        <Reference name="postCreationCode" value="null"/>
+        <Reference name="stops" value="prop:70,anim:,,sequence:24,gradientstop:0.0,#FFFFFF24,gradientstop:1.0,#000000,"/>
+    </Instance>
+    <Instance classID="LinearGradientModel" instanceID="LinearGradientModel2">
+        <Reference name="instanceName" value="str:linearGradient2"/>
+        <Reference name="preCreationCode" value="null"/>
+        <Reference name="postCreationCode" value="null"/>
+        <Reference name="cycleMethod" value="prop:27,anim:,,cyclemethod:NO_CYCLE,"/>
+        <Reference name="proportional" value="prop:16,anim:,,bool:true,"/>
+        <Reference name="stops" value="prop:70,anim:,,sequence:24,gradientstop:0.0,#FFFFFF24,gradientstop:1.0,#CCCCCC,"/>
+    </Instance>
+    <Instance classID="DropShadowEffectModel" instanceID="DropShadowEffectModel1">
+        <Reference name="instanceName" value="str:dropShadowEffect"/>
+        <Reference name="preCreationCode" value="null"/>
+        <Reference name="postCreationCode" value="null"/>
+        <Reference name="offsetX" value="prop:14,anim:,,flt:3.0,4,null,"/>
+        <Reference name="offsetY" value="prop:14,anim:,,flt:3.0,4,null,"/>
+    </Instance>
     <Instance classID="SceneModel" instanceID="SceneModel1">
         <Reference name="instanceName" value="str:scene"/>
         <List name="nodes">
@@ -52,7 +78,7 @@
         <Reference name="width" value="prop:25,anim:0,DISCRETE,flt:400.0,"/>
         <Reference name="height" value="prop:25,anim:0,DISCRETE,flt:450.0,"/>
         <Reference name="cursor" value="prop:30,anim:0,DISCRETE,cursor:DEFAULT,4,null,"/>
-        <Reference name="fill" value="prop:60,anim:0,DISCRETE,paint:sRGB:0.7529412,0.7529412,0.7529412,1.0,4,null,"/>
+        <Reference name="fill" value="prop:32,anim:,,inst:LinearGradientModel2,4,null,"/>
         <Reference name="generateSceneInstance" value="bool:true"/>
         <Reference name="generateScenePanel" value="bool:true"/>
         <Reference name="preCreationCode" value="null"/>
@@ -129,6 +155,7 @@
     </Instance>
     <Instance classID="ImageViewModel" instanceID="ImageViewModel1">
         <Reference name="instanceName" value="str:humanImageView"/>
+        <Reference name="effect" value="prop:34,anim:,,inst:DropShadowEffectModel1,4,null,"/>
         <Reference name="preCreationCode" value="null"/>
         <Reference name="postCreationCode" value="null"/>
     </Instance>
@@ -149,6 +176,7 @@
         <Reference name="instanceName" value="str:scoreLabel"/>
         <Reference name="layoutInfoWidth" value="prop:25,anim:0,DISCRETE,flt:212.0,4,null,"/>
         <Reference name="layoutInfoHeight" value="prop:24,anim:0,DISCRETE,flt:30.0,4,null,"/>
+        <Reference name="effect" value="prop:34,anim:,,inst:DropShadowEffectModel1,4,null,"/>
         <Reference name="preCreationCode" value="null"/>
         <Reference name="postCreationCode" value="null"/>
         <Reference name="graphicNode" value="null"/>
@@ -160,6 +188,7 @@
     <Instance classID="LabelModel" instanceID="LabelModel2">
         <Reference name="instanceName" value="str:highestScoreLabel"/>
         <Reference name="layoutInfoWidth" value="prop:25,anim:0,DISCRETE,flt:212.0,4,null,"/>
+        <Reference name="effect" value="prop:34,anim:,,inst:DropShadowEffectModel1,4,null,"/>
         <Reference name="preCreationCode" value="null"/>
         <Reference name="postCreationCode" value="null"/>
         <Reference name="graphicNode" value="null"/>
@@ -169,6 +198,7 @@
     <Instance classID="LabelModel" instanceID="LabelModel3">
         <Reference name="instanceName" value="str:turnLabel"/>
         <Reference name="layoutInfoWidth" value="prop:25,anim:0,DISCRETE,flt:212.0,4,null,"/>
+        <Reference name="effect" value="prop:34,anim:,,inst:DropShadowEffectModel1,4,null,"/>
         <Reference name="preCreationCode" value="null"/>
         <Reference name="postCreationCode" value="null"/>
         <Reference name="graphicNode" value="null"/>
@@ -189,6 +219,7 @@
     </Instance>
     <Instance classID="ImageViewModel" instanceID="ImageViewModel2">
         <Reference name="instanceName" value="str:aiImageView"/>
+        <Reference name="effect" value="prop:34,anim:,,inst:DropShadowEffectModel1,4,null,"/>
         <Reference name="preCreationCode" value="null"/>
         <Reference name="postCreationCode" value="null"/>
     </Instance>
@@ -196,6 +227,7 @@
         <Reference name="instanceName" value="str:tile"/>
         <Reference name="layoutInfoWidth" value="prop:25,anim:0,DISCRETE,flt:400.0,4,null,"/>
         <Reference name="layoutInfoHeight" value="prop:24,anim:0,DISCRETE,flt:20.0,4,null,"/>
+        <Reference name="effect" value="prop:34,anim:,,inst:DropShadowEffectModel1,4,null,"/>
         <Reference name="preCreationCode" value="null"/>
         <Reference name="postCreationCode" value="null"/>
         <List name="content">
@@ -229,7 +261,7 @@
         <Reference name="preCreationCode" value="null"/>
         <Reference name="postCreationCode" value="null"/>
         <Reference name="graphicNode" value="null"/>
-        <Reference name="text" value="prop:29,anim:0,DISCRETE,str:AI Player,4,null,"/>
+        <Reference name="text" value="prop:19,anim:,,str:Computer,4,null,"/>
         <Reference name="font" value="prop:31,anim:0,DISCRETE,inst:FontModel3,4,null,"/>
         <Reference name="hpos" value="prop:26,anim:0,DISCRETE,hpos:RIGHT,4,null,"/>
     </Instance>
