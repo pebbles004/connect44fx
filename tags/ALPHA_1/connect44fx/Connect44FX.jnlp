@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="http://atlantik-applications.appspot.com/" href="Connect44FX.jnlp">
+    <information>
+        <title>Connect44FX</title>
+        <vendor>JFXWorks</vendor>
+        <homepage href=""/>
+        <description>Connect44FX</description>
+    </information>
+    <security>
+        <all-permissions/>
+    </security>
+    <resources>
+        <j2se version="1.6+" max-heap-size="128m"/>
+        <property name="jnlp.packEnabled" value="true"/>
+        <property name="jnlp.versionEnabled" value="true"/>
+        <extension name="JavaFX Runtime" href="http://dl.javafx.com/1.2/javafx-rt.jnlp"/>
+        <jar href="Connect44FX.jar" main="true"/>
+        <jar href="lib/JFXtras-0.5.jar"/>
+        <jar href="lib/swing-worker-1.2.jar"/>
+    </resources>
+    <application-desc main-class="com.sun.javafx.runtime.main.Main">
+        <argument>MainJavaFXScript=org.jfxworks.connect44fx.Main</argument>
+    </application-desc>
+    <update check="always"/>
+</jnlp>
