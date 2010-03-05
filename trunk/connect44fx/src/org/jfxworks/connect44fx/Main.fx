@@ -68,6 +68,7 @@ def aiPlayer = bind game.currentAiPlayer on replace {
 public function run() :Void {
     // get the high score
     GameService.requestHighestScore( setHighScore );
+    GameService.getFacebookProfile(setFacebookProfile);
 
     // do some syncing with fixed values
     screenNode.humanName.text = game.humanPlayer.name;
@@ -76,7 +77,7 @@ public function run() :Void {
         width: 70
         height: 70
         preserveRatio: true
-    }
+    }    
     screenNode.aiImageView.image = Image {
         url: ResourceLocator.locate( "ai.png" )
         width: 70
@@ -100,6 +101,12 @@ public function run() :Void {
         resizable: true
     }
 }
+
+function setFacebookProfile(profile: FacebookProfile): Void {
+    game.humanPlayer.name = profile.name;
+    game.humanPlayer.imageUrl = profile.picture;
+}
+
 
 function setHighScore( player:String, score:Integer ) :Void {
     if ( score >= 0 ) {
