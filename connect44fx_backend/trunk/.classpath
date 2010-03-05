@@ -6,14 +6,13 @@
 	<classpathentry kind="lib" path="war/javafx/lib/activation-1.1.jar"/>
 	<classpathentry kind="lib" path="war/javafx/lib/commons-lang-2.2.jar"/>
 	<classpathentry kind="lib" path="war/javafx/lib/commons-logging-1.1.1.jar"/>
-	<classpathentry kind="lib" path="war/javafx/lib/facebook-java-api-2.1.1.jar"/>
-	<classpathentry kind="lib" path="war/javafx/lib/facebook-java-api-schema-2.1.1.jar"/>
+	<classpathentry kind="lib" path="war/javafx/lib/facebook-java-api-3.0.2.jar"/>
+	<classpathentry kind="lib" path="war/javafx/lib/facebook-java-api-annotation-processor-3.0.2.jar"/>
+	<classpathentry kind="lib" path="war/javafx/lib/facebook-java-api-schema-3.0.2.jar"/>
 	<classpathentry kind="lib" path="war/javafx/lib/jaxb-api-2.1.jar"/>
 	<classpathentry kind="lib" path="war/javafx/lib/jaxb-impl-2.1.9.jar"/>
 	<classpathentry kind="lib" path="war/javafx/lib/json-20080701.jar"/>
 	<classpathentry kind="lib" path="war/javafx/lib/runtime-0.4.1.5.jar"/>
 	<classpathentry kind="lib" path="war/javafx/lib/stax-api-1.0-2.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/servlet-api-2.5.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/log4j-1.2.15.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

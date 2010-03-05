@@ -14,5 +14,7 @@
         <include path="javafx/*.*" />
         <include path="javafx/lib/*.*" />
         <include path="connect/*.htm" />
+        <include path="connect4/*.*" />
+        <include path="connect4/lib/*.*" />
     </static-files>
 </appengine-web-app>

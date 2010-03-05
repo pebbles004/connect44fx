@@ -1,6 +1,7 @@
 package org.jfxworks.connect44fx;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -12,8 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.MDC;
 import org.w3c.dom.Document;
 
 import com.google.code.facebookapi.FacebookException;
@@ -34,8 +33,9 @@ import com.google.code.facebookapi.IFacebookRestClient;
  */
 public class FacebookUserFilter implements Filter {
 
-	private static final Logger logger = Logger.getLogger(FacebookUserFilter.class);
-
+	private static final Logger logger = Logger.getLogger(FacebookUserFilter.class.getName());
+	public static IFacebookRestClient<Document> userClient;
+	
 	private String api_key;
 	private String secret;
 
@@ -43,6 +43,7 @@ public class FacebookUserFilter implements Filter {
 	private String ipAddress = "ip";
 
 	private static final String FACEBOOK_USER_CLIENT = "facebook.user.client";
+	private static final String FACEBOOK_SESSION_ID = "facebook.sessionid";
 
 	public void init(FilterConfig filterConfig) throws ServletException {
 		logger.info("partito");
@@ -67,26 +68,30 @@ public class FacebookUserFilter implements Filter {
 	public void doFilter(ServletRequest req, ServletResponse res,
 			FilterChain chain) throws IOException, ServletException {
 		try {
-			MDC.put(ipAddress, req.getRemoteAddr());
+			logger.info("Do filter");
+			//MDC.put(ipAddress, req.getRemoteAddr());
 
 			HttpServletRequest request = (HttpServletRequest) req;
 			HttpServletResponse response = (HttpServletResponse) res;
 
 			HttpSession session = request.getSession(true);
-			IFacebookRestClient<Document> userClient = getUserClient(session);
-			if (userClient == null) {
-				logger.debug("User session doesn't have a Facebook API client setup yet. Creating one and storing it in the user's session.");
+			IFacebookRestClient<Document> userClient = FacebookUserFilter.userClient;// = getUserClient(session);
+			if (FacebookUserFilter.userClient == null) {
+				logger.warning("User session doesn't have a Facebook API client setup yet. Creating one and storing it in the user's session.");
 				userClient = new FacebookXmlRestClient(api_key, secret);
-				session.setAttribute(FACEBOOK_USER_CLIENT, userClient);
+				FacebookUserFilter.userClient = userClient;
 			}
+			String sessionKey = userClient.getCacheSessionKey();
+			logger.info("Session key used in filter: " + sessionKey);
+			session.setAttribute(FACEBOOK_SESSION_ID, sessionKey);
 
-			logger.trace("Creating a FacebookWebappHelper, which copies fb_ request param data into the userClient");
+			logger.info("Creating a FacebookWebappHelper, which copies fb_ request param data into the userClient");
 			FacebookWebappHelper<Document> facebook = new FacebookWebappHelper<Document>(
 					request, response, api_key, secret, userClient);
 			String nextPage = request.getRequestURI();
 			/* cut out the first /, the context path and the 2nd / */
 			nextPage = nextPage.substring(nextPage.indexOf("/", 1) + 1);
-			logger.trace(nextPage);
+			logger.info(nextPage);
 			boolean redirectOccurred = facebook.requireLogin(nextPage);
 			if (redirectOccurred) {
 				return;
@@ -103,19 +108,19 @@ public class FacebookUserFilter implements Filter {
 				response.sendError(
 						HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 						"Error while fetching user's facebook ID");
-				logger.error("Error while getting cached (supplied by request params) value "
+				logger.severe("Error while getting cached (supplied by request params) value "
 								+ "of the user's facebook ID or while fetching it from the Facebook service "
 								+ "if the cached value was not present for some reason. Cached value = {}"
 								+ userClient.getCacheUserId());
 				return;
 			}
 
-			MDC.put(facebookUserId, String.valueOf(facebookUserID));
+			//MDC.put(facebookUserId, String.valueOf(facebookUserID));
 
 			chain.doFilter(request, response);
 		} finally {
-			MDC.remove(ipAddress);
-			MDC.remove(facebookUserId);
+			//MDC.remove(ipAddress);
+			//MDC.remove(facebookUserId);
 		}
 	}
 

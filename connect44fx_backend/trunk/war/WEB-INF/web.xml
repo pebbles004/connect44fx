@@ -17,7 +17,7 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 		<param-name>facebook_secret</param-name>
 		<param-value>70c267adb7c41b4a27144caa32d07a9f</param-value>
 	</context-param>
-
+	<!-- 
 	<filter>
 		<display-name>FacebookUserFilter</display-name>
 		<filter-name>FacebookUserFilter</filter-name>
@@ -25,6 +25,27 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	</filter>
 	<filter-mapping>
 		<filter-name>FacebookUserFilter</filter-name>
-		<url-pattern>/*</url-pattern>
+		<url-pattern>/*</url-pattern>		
 	</filter-mapping>
+	
+	<servlet>
+		<servlet-name>SaveScoreServlet</servlet-name>
+		<servlet-class>org.jfxworks.connect44fx.servlet.SaveScoreServlet</servlet-class>		
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>SaveScoreServlet</servlet-name>
+		<url-pattern>/SaveScoreServlet</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>LoadScoreServlet</servlet-name>
+		<servlet-class>org.jfxworks.connect44fx.servlet.LoadScoreServlet</servlet-class>		
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>LoadScoreServlet</servlet-name>
+		<url-pattern>/LoadScoreServlet</url-pattern>
+	</servlet-mapping>
+	-->
 </web-app>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="1.0+" codebase="http://localhost:8082/servlet/org.netbeans.modules.javafx.project.JnlpDownloadServlet/C%3A/Personal/Projects/JavaFx/TestFacebook/dist/" href="TestFacebook.jnlp">
+<jnlp spec="1.0+" codebase="http://connect44fx.appspot.com/javafx/" href="TestFacebook.jnlp">
     <information>
         <title>TestFacebook</title>
-        <vendor>Steven</vendor>
-        <homepage href="http://localhost:8082/servlet/org.netbeans.modules.javafx.project.JnlpDownloadServlet/C%3A/Personal/Projects/JavaFx/TestFacebook/dist/"/>
+        <vendor>JfxWorks</vendor>
+        <homepage href="http://connect44fx.appspot.com/"/>
         <description>TestFacebook</description>
         <offline-allowed/>
         <shortcut>
@@ -17,11 +17,12 @@
         <j2se version="1.5+"/>
         <extension name="JavaFX Runtime" href="http://dl.javafx.com/1.2/javafx-rt.jnlp"/>
         <jar href="TestFacebook.jar" main="true"/>
-        <jar href="lib/facebook-java-api-2.1.1.jar"/>
-        <jar href="lib/facebook-java-api-schema-2.1.1.jar"/>
         <jar href="lib/activation-1.1.jar"/>
         <jar href="lib/commons-lang-2.2.jar"/>
         <jar href="lib/commons-logging-1.1.1.jar"/>
+        <jar href="lib/facebook-java-api-3.0.2.jar"/>
+        <jar href="lib/facebook-java-api-annotation-processor-3.0.2.jar"/>
+        <jar href="lib/facebook-java-api-schema-3.0.2.jar"/>
         <jar href="lib/jaxb-api-2.1.jar"/>
         <jar href="lib/jaxb-impl-2.1.9.jar"/>
         <jar href="lib/json-20080701.jar"/>
