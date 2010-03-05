@@ -109,6 +109,7 @@ function createCoinNode(width: Integer, height: Integer, round: Integer, player:
     var coin: Node;
 
     if (player.isHuman()) {
+        /*
         coin = Ellipse {
             radiusX: width / 2 - 8
             radiusY: height / 2 - 8
@@ -116,15 +117,35 @@ function createCoinNode(width: Integer, height: Integer, round: Integer, player:
             centerY: height / 2
             fill: Color.INDIANRED
         }
+        */
+        coin = ImageView {
+            image: Image {
+                url: ResourceLocator.locate("happyduck.png");
+                width: width - 16
+                height: height - 16
+            }
+            smooth: true
+        }
+
     }
 
     if (player.isAI()) {
+        /*
         coin = Ellipse {
             radiusX: width / 2 - 8
             radiusY: height / 2 - 8
             centerX: width / 2
             centerY: height / 2
             fill: Color.DARKCYAN
+        }
+        */
+        coin = ImageView {
+            image: Image {
+                url: ResourceLocator.locate("devilduck.png");
+                width: width - 16
+                height: height - 16
+            }
+            smooth: true
         }
     }
 
