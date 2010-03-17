@@ -31,8 +31,8 @@ import org.jfxworks.connect44fx.ResourceLocator;
 import org.jfxworks.connect44fx.resources.Ok;
 
 
-// EXPERIMENTAL : Set this to false to for generated classes of InkScape.
-def USE_DEFAULT_SKINS = true;
+var humanCoinImage:Image;
+var aiCoinImage:Image;
 
 public function createIconPopupMEssageNode( width:Integer, height:Integer, message:String, onClick: function(: MouseEvent): Void): Node {
     def popup = IconMessagePopup{};
@@ -118,12 +118,17 @@ function createCoinNode(width: Integer, height: Integer, round: Integer, player:
             fill: Color.INDIANRED
         }
         */
-        coin = ImageView {
-            image: Image {
+        if ( humanCoinImage == null ) {
+            humanCoinImage = Image {
                 url: ResourceLocator.locate("happyduck.png");
                 width: width - 16
                 height: height - 16
+                backgroundLoading: true
             }
+        }
+        
+        coin = ImageView {
+            image: humanCoinImage
             smooth: true
         }
 
@@ -139,12 +144,17 @@ function createCoinNode(width: Integer, height: Integer, round: Integer, player:
             fill: Color.DARKCYAN
         }
         */
-        coin = ImageView {
-            image: Image {
+        if ( aiCoinImage == null ) {
+            aiCoinImage = Image {
                 url: ResourceLocator.locate("devilduck.png");
                 width: width - 16
                 height: height - 16
+                backgroundLoading: true
             }
+        }
+
+        coin = ImageView {
+            image: aiCoinImage
             smooth: true
         }
     }
@@ -273,7 +283,7 @@ class CellNode extends CustomNode {
 
         var cell:Node;
 
-        if ( USE_DEFAULT_SKINS ) {
+        if ( true ) {
             cell = ShapeSubtract {
                     a: Rectangle {
                         width: width

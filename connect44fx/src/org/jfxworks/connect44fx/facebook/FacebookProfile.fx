@@ -4,7 +4,7 @@
  * Created on Mar 5, 2010, 2:35:20 PM
  */
 
-package org.jfxworks.connect44fx;
+package org.jfxworks.connect44fx.facebook;
 
 /**
  * @author rymenst

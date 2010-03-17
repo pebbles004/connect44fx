@@ -16,6 +16,7 @@ import javafx.scene.image.*;
 import org.jfxworks.connect44fx.GameService;
 import java.lang.System;
 import org.jfxworks.connect44fx.ResourceLocator;
+import org.jfxworks.connect44fx.facebook.*;
 
 def WIDTH  = 400;
 def HEIGHT = 342;
@@ -60,6 +61,7 @@ def aiPlayer = bind game.currentAiPlayer on replace {
             width: 70
             height: 70
             preserveRatio: true
+            backgroundLoading: true
         }
     }
 }
@@ -68,7 +70,7 @@ def aiPlayer = bind game.currentAiPlayer on replace {
 public function run() :Void {
     // get the high score
     GameService.requestHighestScore( setHighScore );
-    GameService.getFacebookProfile(setFacebookProfile);
+    GameService.getFacebookProfile( setFacebookProfile );
 
     // do some syncing with fixed values
     screenNode.humanName.text = game.humanPlayer.name;
@@ -77,12 +79,14 @@ public function run() :Void {
         width: 70
         height: 70
         preserveRatio: true
+        backgroundLoading: true
     }    
     screenNode.aiImageView.image = Image {
         url: ResourceLocator.locate( "ai.png" )
         width: 70
         height: 70
         preserveRatio: true
+        backgroundLoading: true
     }
 
     // set the event listeners

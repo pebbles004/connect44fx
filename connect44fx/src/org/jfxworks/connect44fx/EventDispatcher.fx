@@ -28,6 +28,10 @@ public mixin class EventDispatcher {
     def mirrorOfThis = context.mirrorOf( this );
     def typeOfThis   = mirrorOfThis.getType();
 
+    /**
+     * Find the event types declared by the implementing class.
+     * The naming convention is that the name should start with 'EVENT_TYPE_' AND it should be a String
+     */
     postinit {
         for ( variable in typeOfThis.getVariables( true ) ) {
             if ( variable.getName().startsWith("EVENT_TYPE_") and "java.lang.String".equals( variable.getType().getName() ) ) {
@@ -46,7 +50,6 @@ public mixin class EventDispatcher {
         }
 
         // is the callback function argument a function ?
-        // who the ***** designed the reflection API ???
         if ( not isFunction( callbackFunction ) ) {
             throw new RuntimeException("The passed callback is not a function !")
         }
@@ -156,18 +159,4 @@ public mixin class EventDispatcher {
 class EventTypeEntry {
     public-init var type:String;
     public var listeners: Object[];
-}
-
-
-class TestDispatcher extends EventDispatcher {
-    def EVENT_TYPE_KILL = "test";
-}
-
-public function run() {
-    def dispatcher = TestDispatcher {};
-    dispatcher.addEventListener( dispatcher.EVENT_TYPE_KILL, callback );
-}
-
-function callback ( name:String ) {
-
 }
