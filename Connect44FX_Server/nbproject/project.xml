@@ -55,6 +55,7 @@
                 </library>
                 <library dirs="200">
                     <file>${file.reference.Connect44FX.jnlp}</file>
+                    <path-in-war>/</path-in-war>
                 </library>
                 <library dirs="200">
                     <file>${file.reference.Connect44FX_browser.jnlp}</file>
@@ -74,6 +75,14 @@
                 </library>
                 <library dirs="200">
                     <file>${file.reference.swing-worker-1.2.jar}</file>
+                    <path-in-war>/lib</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${file.reference.FacebookResponse.jar}</file>
+                    <path-in-war>/lib</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${file.reference.FacebookResponse.jar.pack.gz}</file>
                     <path-in-war>/lib</path-in-war>
                 </library>
             </web-module-additional-libraries>
