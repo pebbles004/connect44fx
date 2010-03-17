@@ -15,18 +15,13 @@ import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.Exception;
-import org.jfxworks.connect44fx.Model.Player;
-import com.google.code.facebookapi.FacebookXmlRestClient;
-import com.google.code.facebookapi.schema.User;
-import com.google.code.facebookapi.FacebookJaxbRestClient;
-import com.google.code.facebookapi.schema.FriendsGetResponse;
-import com.google.code.facebookapi.ProfileField;
-import java.util.ArrayList;
-import java.util.List;
-import com.google.code.facebookapi.schema.UsersGetInfoResponse;
+import org.jfxworks.connect44fx.facebook.FacebookProfile;
+import org.jfxworks.connect44fx.Model.*;
+import org.jfxworks.connect44fx.facebook.FacebookAPI;
 
 // TODO Put into configuration
-def scoreServiceURL = "http://atlantik-applications.appspot.com/scores/connect44fx";
+def scoreServiceURL = "http://connect44fx.appspot.com/scores/connect44fx";
+def api:FacebookAPI = FacebookAPI{sessionKey:FX.getArgument("sessionId") as String};
 
 /**
  * Request the highest score for this game, for the specified player.
@@ -125,35 +120,8 @@ function getStringFromStream( input:InputStream ) :String {
     }
 }
 
-
 public function getFacebookProfile(callback: function(:FacebookProfile)): Void {
-    def API_KEY = "48efdf44cf8597c8bd5445c0bbcb1ce6";
-    def SECRET_KEY = "70c267adb7c41b4a27144caa32d07a9f";
-    def session: String = FX.getArgument("sessionId") as String;
-
-    println("SessionId = {session}");
-
-    var client: FacebookJaxbRestClient = new FacebookJaxbRestClient(API_KEY, SECRET_KEY, session);
-
-    var userIds:List = new ArrayList();
-    userIds.add(client.users_getLoggedInUser());
-
-    def profileFields:List = new ArrayList();
-    profileFields.add(ProfileField.UID);
-    profileFields.add(ProfileField.NAME);
-    profileFields.add(ProfileField.PIC_SMALL);
-
-    def userInfo:UsersGetInfoResponse = client.users_getInfo(userIds, profileFields);
-    var user:User = userInfo.getUser().get(0);
-    
-    println(user.getPicSmall());
-
-    var profile = FacebookProfile {
-        id: user.getUid();
-        name: user.getName();
-        picture: user.getPicSmall();
-    };
-
+    def profile:FacebookProfile = api.getLoggedInUser();
     println("Logged in user is {profile.id}");
     callback(profile);
 }

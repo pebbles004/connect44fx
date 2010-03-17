@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="6.0+" codebase="http://atlantik-applications.appspot.com/" href="Connect44FX_browser.jnlp" version="alpha1">
+<jnlp spec="6.0+">
     <information>
         <title>Connect44FX</title>
         <vendor>JFXWorks</vendor>
@@ -17,6 +17,7 @@
         <jar href="Connect44FX.jar" main="true"/>
         <jar href="lib/JFXtras-0.5.jar"/>
         <jar href="lib/swing-worker-1.2.jar"/>
+        <jar href="lib/FacebookResponse.jar"/>
     </resources>
     <applet-desc name="Connect44FX" main-class="com.sun.javafx.runtime.adapter.Applet" width="400" height="450">
         <param name="MainJavaFXScript" value="org.jfxworks.connect44fx.Main"/>
